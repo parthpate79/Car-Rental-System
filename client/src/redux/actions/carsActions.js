@@ -8,7 +8,7 @@ export const getAllCars = () => async dispatch => {
     try {
 
         const response = await axios.get(
-            'http://https://car-rental-system-dkt6.onrender.com/api/cars/getallcars'
+            'https://car-rental-system-dkt6.onrender.com/api/cars/getallcars'
         );
 
         dispatch({
@@ -35,7 +35,7 @@ export const addCar = (reqObj) => async dispatch => {
     try {
 
         await axios.post(
-            'http://https://car-rental-system-dkt6.onrender.com/api/cars/addcar',
+            'https://car-rental-system-dkt6.onrender.com/api/cars/addcar',
             reqObj
         );
 
@@ -66,7 +66,7 @@ export const editCar = (reqObj) => async dispatch => {
     try {
 
         await axios.post(
-            'http://https://car-rental-system-dkt6.onrender.com/api/cars/editcar',
+            'https://car-rental-system-dkt6.onrender.com/api/cars/editcar',
             reqObj
         );
 
@@ -97,7 +97,7 @@ export const deleteCar = (reqObj) => async dispatch => {
     try {
 
         await axios.post(
-            'http://https://car-rental-system-dkt6.onrender.com/api/cars/deletecar',
+            'https://car-rental-system-dkt6.onrender.com/api/cars/deletecar',
             reqObj
         );
 
