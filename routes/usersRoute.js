@@ -2,12 +2,17 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/userModel");
 
-// Login
+// ================= LOGIN =================
+
 router.post("/login", async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const username = req.body.username?.trim();
+    const password = req.body.password;
 
-    const user = await User.findOne({ username, password });
+    const user = await User.findOne({
+      username,
+      password,
+    });
 
     if (!user) {
       return res.status(400).json({
@@ -15,20 +20,25 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    res.send(user);
+    res.status(200).json(user);
   } catch (error) {
-    console.log(error);
-    res.status(500).json(error);
+    console.log("LOGIN ERROR:", error);
+
+    res.status(500).json({
+      message: "Login failed",
+    });
   }
 });
 
-// Register
+// ================= REGISTER =================
+
 router.post("/register", async (req, res) => {
   try {
-    console.log("Register Request:", req.body);
+    const username = req.body.username?.trim();
+    const password = req.body.password;
 
     const existingUser = await User.findOne({
-      username: req.body.username,
+      username,
     });
 
     if (existingUser) {
@@ -38,22 +48,47 @@ router.post("/register", async (req, res) => {
     }
 
     const newUser = new User({
-      username: req.body.username,
-      password: req.body.password,
+      username,
+      password,
+      isAdmin: false,
     });
 
     await newUser.save();
 
-    console.log("User Registered Successfully");
-
     res.status(201).json({
-  message: "User Registered Successfully",
-});
+      message: "User Registered Successfully",
+    });
   } catch (error) {
-    console.log("REGISTER ERROR:");
-    console.log(error);
+    console.log("REGISTER ERROR:", error);
 
-    res.status(500).json(error);
+    res.status(500).json({
+      message: "Registration failed",
+    });
+  }
+});
+
+// ================= TEMPORARY ADMIN FIX =================
+
+router.get("/fixadmin", async (req, res) => {
+  try {
+    const user = await User.findOne({
+      username: "parthpatel79_",
+    });
+
+    if (!user) {
+      return res.status(404).send("Admin user not found");
+    }
+
+    user.password = "Parth0!81#";
+    user.isAdmin = true;
+
+    await user.save();
+
+    res.send("Admin password fixed successfully");
+  } catch (error) {
+    console.log("ADMIN FIX ERROR:", error);
+
+    res.status(500).send("Error fixing admin account");
   }
 });
 
