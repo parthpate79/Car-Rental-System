@@ -39,7 +39,7 @@ export const userRegister = (reqObj) => async dispatch => {
     try {
 
         await axios.post(
-            "http://https://car-rental-system-dkt6.onrender.com/api/users/register",
+            "http://car-rental-system-dkt6.onrender.com/api/users/register",
             reqObj
         );
 

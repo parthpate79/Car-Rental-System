@@ -55,7 +55,7 @@ export const getAllBookings = () => async (dispatch) => {
   try {
 
     const response = await axios.get(
-  "http://https://car-rental-system-dkt6.onrender.com/api/bookings/getallbookings"
+  "http://car-rental-system-dkt6.onrender.com/api/bookings/getallbookings"
 );
 
 console.log("Bookings API Response:", response.data);
