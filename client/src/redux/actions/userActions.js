@@ -1,62 +1,70 @@
 import axios from "axios";
 import { message } from "antd";
 
-export const userLogin = (reqObj) => async dispatch => {
+const API_URL = "https://car-rental-system-dkt6.onrender.com";
 
-    dispatch({ type: 'LOADING', payload: true });
+export const userLogin = (reqObj) => async (dispatch) => {
+  dispatch({
+    type: "LOADING",
+    payload: true,
+  });
 
-    try {
+  try {
+    const response = await axios.post(
+      `${API_URL}/api/users/login`,
+      reqObj
+    );
 
-        const response = await axios.post(
-            "http://https://car-rental-system-dkt6.onrender.com/api/users/login",
-            reqObj
-        );
+    localStorage.setItem("user", JSON.stringify(response.data));
 
-        localStorage.setItem("user", JSON.stringify(response.data));
+    message.success("Login successful");
 
-        message.success("Login Success");
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 1000);
+  } catch (error) {
+    console.error("Login error:", error);
 
-        dispatch({ type: 'LOADING', payload: false });
-
-        window.location.href = "/";
-
-    } catch (error) {
-
-        console.log(error);
-
-        message.error("Something went wrong");
-
-        dispatch({ type: 'LOADING', payload: false });
-
-    }
-
+    message.error(
+      error.response?.data?.message ||
+      "Invalid username or password"
+    );
+  } finally {
+    dispatch({
+      type: "LOADING",
+      payload: false,
+    });
+  }
 };
 
-export const userRegister = (reqObj) => async dispatch => {
+export const userRegister = (reqObj) => async (dispatch) => {
+  dispatch({
+    type: "LOADING",
+    payload: true,
+  });
 
-    dispatch({ type: 'LOADING', payload: true });
+  try {
+    await axios.post(
+      `${API_URL}/api/users/register`,
+      reqObj
+    );
 
-    try {
+    message.success("Registration successful");
 
-        await axios.post(
-            "http://car-rental-system-dkt6.onrender.com/api/users/register",
-            reqObj
-        );
+    setTimeout(() => {
+      window.location.href = "/login";
+    }, 1000);
+  } catch (error) {
+    console.error("Registration error:", error);
 
-        message.success("Registration Successful");
-
-        dispatch({ type: 'LOADING', payload: false });
-
-        window.location.href = "/login";
-
-    } catch (error) {
-
-        console.log(error);
-
-        message.error("Something went wrong");
-
-        dispatch({ type: 'LOADING', payload: false });
-
-    }
-
+    message.error(
+      error.response?.data?.message ||
+      "Registration failed. Please try again."
+    );
+  } finally {
+    dispatch({
+      type: "LOADING",
+      payload: false,
+    });
+  }
 };
