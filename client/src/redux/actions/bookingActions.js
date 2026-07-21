@@ -13,7 +13,7 @@ export const bookCar = (reqObj) => async (dispatch) => {
   try {
 
     await axios.post(
-      "http://https://car-rental-system-dkt6.onrender.com/api/bookings/bookcar",
+      "http://car-rental-system-dkt6.onrender.com/api/bookings/getallbookings",
       reqObj
     );
 
