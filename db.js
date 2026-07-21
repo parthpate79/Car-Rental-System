@@ -7,6 +7,8 @@ async function connectDB() {
   try {
     const mongoUrl = process.env.MONGO_URL;
 
+console.log("Mongo URL starts with:", mongoUrl?.substring(0, 20));
+
     if (!mongoUrl) {
       throw new Error("MONGO_URL is missing in environment variables");
     }
