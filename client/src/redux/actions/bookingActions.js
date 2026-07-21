@@ -1,6 +1,8 @@
 import axios from "axios";
 import { message } from "antd";
 
+const API = "https://car-rental-system-dkt6.onrender.com";
+
 // ================= BOOK CAR =================
 
 export const bookCar = (reqObj) => async (dispatch) => {
@@ -13,7 +15,7 @@ export const bookCar = (reqObj) => async (dispatch) => {
   try {
 
     await axios.post(
-      "http://car-rental-system-dkt6.onrender.com/api/bookings/getallbookings",
+      `${API}/api/bookings/bookcar`,
       reqObj
     );
 
@@ -37,7 +39,7 @@ export const bookCar = (reqObj) => async (dispatch) => {
       payload: false,
     });
 
-    message.error("Something went wrong, please try later");
+    message.error("Something went wrong");
 
   }
 
@@ -55,15 +57,13 @@ export const getAllBookings = () => async (dispatch) => {
   try {
 
     const response = await axios.get(
-  "http://car-rental-system-dkt6.onrender.com/api/bookings/getallbookings"
-);
+      `${API}/api/bookings/getallbookings`
+    );
 
-console.log("Bookings API Response:", response.data);
-
-dispatch({
-  type: "GET_ALL_BOOKINGS",
-  payload: response.data,
-});
+    dispatch({
+      type: "GET_ALL_BOOKINGS",
+      payload: response.data,
+    });
 
     dispatch({
       type: "LOADING",
