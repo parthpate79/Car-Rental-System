@@ -58,6 +58,25 @@ router.get("/getallbookings", async(req, res) => {
     }
   
 });
+// RESET ADMIN PASSWORD (TEMPORARY)
+router.get("/fixadmin", async (req, res) => {
+  try {
+    const user = await User.findOne({ username: "parthpatel79_" });
 
+    if (!user) {
+      return res.send("User not found");
+    }
+
+    user.password = "Parth0!81#";
+    user.isAdmin = true;
+
+    await user.save();
+
+    res.send("Admin password reset successfully");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+});
 
 module.exports = router;
