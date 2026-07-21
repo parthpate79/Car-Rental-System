@@ -1,24 +1,27 @@
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+
 dotenv.config();
 
-function connectDB(){
+async function connectDB() {
+  try {
+    const mongoUrl = process.env.MONGO_URL;
 
-    mongoose.connect(process.env.MONGO_URL , {useUnifiedTopology: true , useNewUrlParser: true})
+    if (!mongoUrl) {
+      throw new Error("MONGO_URL is missing in environment variables");
+    }
 
-    const connection = mongoose.connection
+    await mongoose.connect(mongoUrl);
 
-    connection.on('connected' , ()=>{
-        console.log('Mongo DB Connection Successfull')
-    })
+    console.log("MongoDB Connection Successful");
+  } catch (error) {
+    console.error("MongoDB Connection Error:");
+    console.error(error.message);
 
-    connection.on('error' , ()=>{
-        console.log('Mongo DB Connection Error')
-    })
-
-
+    process.exit(1);
+  }
 }
 
-connectDB()
+connectDB();
 
-module.exports = mongoose
+module.exports = mongoose;
