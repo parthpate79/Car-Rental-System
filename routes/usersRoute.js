@@ -3,16 +3,12 @@ const router = express.Router();
 const User = require("../models/userModel");
 
 // ================= LOGIN =================
-
 router.post("/login", async (req, res) => {
   try {
-    const username = req.body.username?.trim();
+    const username = req.body.username.trim();
     const password = req.body.password;
 
-    const user = await User.findOne({
-      username,
-      password,
-    });
+    const user = await User.findOne({ username, password });
 
     if (!user) {
       return res.status(400).json({
@@ -20,26 +16,20 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    res.status(200).json(user);
+    res.send(user);
   } catch (error) {
-    console.log("LOGIN ERROR:", error);
-
-    res.status(500).json({
-      message: "Login failed",
-    });
+    console.log(error);
+    res.status(500).json(error);
   }
 });
 
 // ================= REGISTER =================
-
 router.post("/register", async (req, res) => {
   try {
-    const username = req.body.username?.trim();
+    const username = req.body.username.trim();
     const password = req.body.password;
 
-    const existingUser = await User.findOne({
-      username,
-    });
+    const existingUser = await User.findOne({ username });
 
     if (existingUser) {
       return res.status(400).json({
@@ -55,20 +45,16 @@ router.post("/register", async (req, res) => {
 
     await newUser.save();
 
-    res.status(201).json({
+    res.send({
       message: "User Registered Successfully",
     });
   } catch (error) {
-    console.log("REGISTER ERROR:", error);
-
-    res.status(500).json({
-      message: "Registration failed",
-    });
+    console.log(error);
+    res.status(500).json(error);
   }
 });
 
-// ================= TEMPORARY ADMIN FIX =================
-
+// ================= FIX ADMIN =================
 router.get("/fixadmin", async (req, res) => {
   try {
     const user = await User.findOne({
@@ -84,11 +70,10 @@ router.get("/fixadmin", async (req, res) => {
 
     await user.save();
 
-    res.send("Admin password fixed successfully");
+    res.send("✅ Admin password fixed successfully");
   } catch (error) {
-    console.log("ADMIN FIX ERROR:", error);
-
-    res.status(500).send("Error fixing admin account");
+    console.log(error);
+    res.status(500).send("Error fixing admin");
   }
 });
 
