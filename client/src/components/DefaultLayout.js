@@ -170,7 +170,7 @@ function DefaultLayout({ children }) {
         <p>© 2026 All Rights Reserved</p>
 
         <p>
-          Developed by <b>Parth Patel & Darshil Joshi</b>
+          Developed by <b>Parth Patel & Darshil Doshi</b>
         </p>
       </div>
     </div>
