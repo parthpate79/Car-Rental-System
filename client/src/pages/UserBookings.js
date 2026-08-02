@@ -7,10 +7,8 @@ import React, {
 import {
   Button,
   Card,
-  Col,
   Empty,
   Popconfirm,
-  Row,
   Tag,
   Typography,
 } from "antd";
@@ -18,16 +16,19 @@ import {
 import {
   CalendarOutlined,
   CarOutlined,
+  CheckCircleOutlined,
   ClockCircleOutlined,
+  CloseCircleOutlined,
   DollarCircleOutlined,
   EyeOutlined,
+  HistoryOutlined,
   ReloadOutlined,
+  SafetyCertificateOutlined,
   StarOutlined,
+  SyncOutlined,
 } from "@ant-design/icons";
 
-import {
-  Link,
-} from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import {
   useDispatch,
@@ -82,9 +83,19 @@ function UserBookings() {
     setSelectedBooking,
   ] = useState(null);
 
-  const user = JSON.parse(
-    localStorage.getItem("user")
-  );
+  let user = null;
+
+  try {
+    user = JSON.parse(
+      localStorage.getItem("user") ||
+        "null"
+    );
+  } catch (error) {
+    console.error(
+      "Invalid user information:",
+      error
+    );
+  }
 
   useEffect(() => {
     dispatch(getAllBookings());
@@ -95,45 +106,80 @@ function UserBookings() {
       bookings.filter(
         (booking) =>
           booking.user === user?._id ||
-          booking.user?._id === user?._id
+          booking.user?._id ===
+            user?._id
       ),
     [bookings, user?._id]
   );
 
-  const getStatus = (booking) => {
+  const getTripStatus = (booking) => {
     if (
-      booking.bookingStatus === "cancelled"
+      booking.bookingStatus ===
+      "cancelled"
     ) {
       return "cancelled";
     }
 
     const now = Date.now();
 
-    const from = new Date(
+    const pickupTime = new Date(
       booking.bookedTimeSlots?.from
     ).getTime();
 
-    const to = new Date(
+    const returnTime = new Date(
       booking.bookedTimeSlots?.to
     ).getTime();
 
     if (
-      Number.isNaN(from) ||
-      Number.isNaN(to)
+      Number.isNaN(pickupTime) ||
+      Number.isNaN(returnTime)
     ) {
       return "upcoming";
     }
 
-    if (now < from) {
+    if (now < pickupTime) {
       return "upcoming";
     }
 
-    if (now >= from && now <= to) {
+    if (
+      now >= pickupTime &&
+      now <= returnTime
+    ) {
       return "ongoing";
     }
 
     return "completed";
   };
+
+  const statistics = useMemo(() => {
+    return {
+      total: userBookings.length,
+
+      upcoming: userBookings.filter(
+        (booking) =>
+          getTripStatus(booking) ===
+          "upcoming"
+      ).length,
+
+      ongoing: userBookings.filter(
+        (booking) =>
+          getTripStatus(booking) ===
+          "ongoing"
+      ).length,
+
+      completed: userBookings.filter(
+        (booking) =>
+          getTripStatus(booking) ===
+          "completed"
+      ).length,
+
+      cancelled: userBookings.filter(
+        (booking) =>
+          getTripStatus(booking) ===
+          "cancelled"
+      ).length,
+    };
+  }, [userBookings]);
 
   const filteredBookings = useMemo(() => {
     if (filter === "all") {
@@ -142,12 +188,36 @@ function UserBookings() {
 
     return userBookings.filter(
       (booking) =>
-        getStatus(booking) === filter
+        getTripStatus(booking) ===
+        filter
     );
   }, [filter, userBookings]);
 
-  const getStatusTag = (status) => {
-    const statusDetails = {
+  const getCarName = (booking) => {
+    const name =
+      booking.car?.name?.trim();
+
+    if (
+      name &&
+      !name.startsWith("http://") &&
+      !name.startsWith("https://")
+    ) {
+      return name;
+    }
+
+    return (
+      [
+        booking.car?.brand,
+        booking.car?.model,
+      ]
+        .filter(Boolean)
+        .join(" ") ||
+      "DriveEase Rental Car"
+    );
+  };
+
+  const getStatusDetails = (status) => {
+    const statusMap = {
       upcoming: {
         color: "blue",
         label: "Upcoming",
@@ -169,44 +239,13 @@ function UserBookings() {
       },
     };
 
-    const details =
-      statusDetails[status] ||
-      statusDetails.upcoming;
-
     return (
-      <Tag
-        color={details.color}
-        className="trip-status-tag"
-      >
-        {details.label}
-      </Tag>
+      statusMap[status] ||
+      statusMap.upcoming
     );
   };
 
-  const getCarName = (booking) => {
-    const name =
-      booking.car?.name?.trim();
-
-    if (
-      name &&
-      !name.startsWith("http://") &&
-      !name.startsWith("https://")
-    ) {
-      return name;
-    }
-
-    return (
-      [
-        booking.car?.brand,
-        booking.car?.model,
-      ]
-        .filter(Boolean)
-        .join(" ") ||
-      "Rental Car"
-    );
-  };
-
-  const openReview = (booking) => {
+  const openReviewModal = (booking) => {
     setSelectedBooking(booking);
     setReviewOpen(true);
   };
@@ -215,24 +254,113 @@ function UserBookings() {
     <DefaultLayout>
       {loading && <Spinner />}
 
-      <section className="my-trips-page">
-        <div className="my-trips-header">
-          <div>
-            <Text className="section-label">
+      <section className="trips-dashboard-page">
+        <div className="trips-dashboard-hero">
+          <div className="trips-hero-content">
+            <Text className="trips-hero-label">
+              <CarOutlined />
               YOUR JOURNEYS
             </Text>
 
             <Title level={1}>
-              🚗 My Trips
+              My Trips
             </Title>
 
             <Paragraph>
-              Manage your upcoming, ongoing,
-              completed and cancelled journeys.
+              Manage upcoming reservations,
+              ongoing journeys, completed trips
+              and booking history from one
+              dashboard.
             </Paragraph>
+
+            <div className="trips-hero-features">
+              <div>
+                <span>
+                  <SafetyCertificateOutlined />
+                </span>
+
+                <div>
+                  <strong>
+                    Secure Bookings
+                  </strong>
+
+                  <small>
+                    View every confirmed rental
+                    safely.
+                  </small>
+                </div>
+              </div>
+
+              <div>
+                <span>
+                  <SyncOutlined />
+                </span>
+
+                <div>
+                  <strong>
+                    Live Trip Status
+                  </strong>
+
+                  <small>
+                    Upcoming, ongoing and
+                    completed.
+                  </small>
+                </div>
+              </div>
+
+              <div>
+                <span>
+                  <HistoryOutlined />
+                </span>
+
+                <div>
+                  <strong>
+                    Complete History
+                  </strong>
+
+                  <small>
+                    Access receipts and past
+                    journeys.
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="trips-hero-summary">
+            <div>
+              <ClockCircleOutlined />
+
+              <span>Upcoming</span>
+
+              <strong>
+                {statistics.upcoming}
+              </strong>
+            </div>
+
+            <div>
+              <CarOutlined />
+
+              <span>Ongoing</span>
+
+              <strong>
+                {statistics.ongoing}
+              </strong>
+            </div>
+
+            <div>
+              <CheckCircleOutlined />
+
+              <span>Completed</span>
+
+              <strong>
+                {statistics.completed}
+              </strong>
+            </div>
           </div>
 
           <Button
+            className="trips-refresh-button"
             icon={<ReloadOutlined />}
             onClick={() =>
               dispatch(getAllBookings())
@@ -242,7 +370,93 @@ function UserBookings() {
           </Button>
         </div>
 
-        <div className="trip-filter-buttons">
+        <div className="trip-statistics-grid">
+          <Card
+            bordered={false}
+            className="trip-statistic-card"
+          >
+            <span className="trip-stat-icon blue">
+              <CarOutlined />
+            </span>
+
+            <div>
+              <Text>Total Trips</Text>
+
+              <Title level={2}>
+                {statistics.total}
+              </Title>
+
+              <small>
+                All booking records
+              </small>
+            </div>
+          </Card>
+
+          <Card
+            bordered={false}
+            className="trip-statistic-card"
+          >
+            <span className="trip-stat-icon purple">
+              <ClockCircleOutlined />
+            </span>
+
+            <div>
+              <Text>Upcoming</Text>
+
+              <Title level={2}>
+                {statistics.upcoming}
+              </Title>
+
+              <small>
+                Scheduled journeys
+              </small>
+            </div>
+          </Card>
+
+          <Card
+            bordered={false}
+            className="trip-statistic-card"
+          >
+            <span className="trip-stat-icon orange">
+              <SyncOutlined />
+            </span>
+
+            <div>
+              <Text>Ongoing</Text>
+
+              <Title level={2}>
+                {statistics.ongoing}
+              </Title>
+
+              <small>
+                Active rentals
+              </small>
+            </div>
+          </Card>
+
+          <Card
+            bordered={false}
+            className="trip-statistic-card"
+          >
+            <span className="trip-stat-icon green">
+              <CheckCircleOutlined />
+            </span>
+
+            <div>
+              <Text>Completed</Text>
+
+              <Title level={2}>
+                {statistics.completed}
+              </Title>
+
+              <small>
+                Finished journeys
+              </small>
+            </div>
+          </Card>
+        </div>
+
+        <div className="trip-filters">
           {[
             "all",
             "upcoming",
@@ -265,8 +479,16 @@ function UserBookings() {
                 setFilter(item)
               }
             >
-              {item.charAt(0).toUpperCase() +
+              {item
+                .charAt(0)
+                .toUpperCase() +
                 item.slice(1)}
+
+              <span className="trip-filter-count">
+                {item === "all"
+                  ? statistics.total
+                  : statistics[item]}
+              </span>
             </Button>
           ))}
         </div>
@@ -274,11 +496,9 @@ function UserBookings() {
         {filteredBookings.length === 0 ? (
           <Card
             bordered={false}
-            className="trips-empty-card"
+            className="trips-empty-state"
           >
-            <Empty
-              description="No trips found"
-            >
+            <Empty description="No trips found">
               <Link to="/">
                 <Button
                   type="primary"
@@ -290,247 +510,244 @@ function UserBookings() {
             </Empty>
           </Card>
         ) : (
-          <Row
-            gutter={[20, 20]}
-            className="trips-grid"
-          >
+          <div className="trip-cards-grid">
             {filteredBookings.map(
               (booking) => {
                 const status =
-                  getStatus(booking);
+                  getTripStatus(booking);
+
+                const statusDetails =
+                  getStatusDetails(status);
 
                 const carName =
                   getCarName(booking);
 
                 return (
-                  <Col
-                    xl={8}
-                    lg={12}
-                    md={12}
-                    xs={24}
+                  <article
                     key={booking._id}
-                    className="trip-card-column"
+                    className={`trip-dashboard-card ${status}`}
                   >
-                    <Card
-                      bordered={false}
-                      className={`modern-trip-card ${status}`}
-                      cover={
-                        <div className="trip-image-wrapper">
-                          <img
-                            src={
-                              booking.car?.image ||
-                              "https://placehold.co/800x500?text=DriveEase"
-                            }
-                            alt={carName}
-                          />
+                    <div className="trip-dashboard-image">
+                      <img
+                        src={
+                          booking.car?.image ||
+                          "https://placehold.co/900x560?text=DriveEase"
+                        }
+                        alt={carName}
+                      />
 
-                          <div className="trip-image-overlay" />
+                      <div className="trip-image-gradient" />
 
-                          {getStatusTag(status)}
-                        </div>
-                      }
-                    >
-                      <div className="trip-card-content">
-                        <div>
-                          <Title
-                            level={3}
-                            className="trip-car-name"
-                          >
-                            {carName}
-                          </Title>
+                      <Tag
+                        color={
+                          statusDetails.color
+                        }
+                        className="trip-dashboard-status"
+                      >
+                        {statusDetails.label}
+                      </Tag>
+                    </div>
 
-                          <Text
-                            type="secondary"
-                            className="trip-booking-id"
-                          >
-                            Booking #
-                            {booking._id?.slice(-8)}
-                          </Text>
+                    <div className="trip-dashboard-body">
+                      <div>
+                        <Title
+                          level={3}
+                          className="trip-dashboard-title"
+                        >
+                          {carName}
+                        </Title>
 
-                          <div className="trip-details-grid">
-                            <div>
-                              <DollarCircleOutlined />
+                        <Text className="trip-dashboard-id">
+                          Booking #
+                          {booking._id?.slice(
+                            -8
+                          )}
+                        </Text>
 
-                              <span>Rent</span>
+                        <div className="trip-dashboard-details">
+                          <div>
+                            <DollarCircleOutlined />
 
-                              <strong>
-                                ₹
-                                {formatMoney(
-                                  booking.rentPerHour ||
+                            <span>Rent</span>
+
+                            <strong>
+                              ₹
+                              {formatMoney(
+                                booking.rentPerHour ||
                                   booking.car
                                     ?.rentPerHour
-                                )}
-                                /hr
-                              </strong>
-                            </div>
+                              )}
+                              /hr
+                            </strong>
+                          </div>
 
-                            <div>
-                              <DollarCircleOutlined />
+                          <div>
+                            <DollarCircleOutlined />
 
-                              <span>Amount</span>
+                            <span>Amount</span>
 
-                              <strong>
-                                ₹
-                                {formatMoney(
-                                  booking.totalAmount
-                                )}
-                              </strong>
-                            </div>
+                            <strong>
+                              ₹
+                              {formatMoney(
+                                booking.totalAmount
+                              )}
+                            </strong>
+                          </div>
 
-                            <div>
-                              <CalendarOutlined />
+                          <div>
+                            <CalendarOutlined />
 
-                              <span>Pickup</span>
+                            <span>Pickup</span>
 
-                              <strong>
-                                {moment(
-                                  booking
-                                    .bookedTimeSlots
-                                    ?.from
-                                ).format(
-                                  "DD MMM YYYY"
-                                )}
-                              </strong>
-                            </div>
+                            <strong>
+                              {moment(
+                                booking
+                                  .bookedTimeSlots
+                                  ?.from
+                              ).format(
+                                "DD MMM YYYY"
+                              )}
+                            </strong>
+                          </div>
 
-                            <div>
-                              <ClockCircleOutlined />
+                          <div>
+                            <ClockCircleOutlined />
 
-                              <span>Return</span>
+                            <span>Return</span>
 
-                              <strong>
-                                {moment(
-                                  booking
-                                    .bookedTimeSlots
-                                    ?.to
-                                ).format(
-                                  "DD MMM YYYY"
-                                )}
-                              </strong>
-                            </div>
+                            <strong>
+                              {moment(
+                                booking
+                                  .bookedTimeSlots
+                                  ?.to
+                              ).format(
+                                "DD MMM YYYY"
+                              )}
+                            </strong>
                           </div>
                         </div>
+                      </div>
 
-                        <div className="trip-action-buttons">
-                          {status ===
-                            "upcoming" && (
-                            <>
-                              <Link
-                                to={`/booking-success/${booking._id}`}
-                              >
-                                <Button
-                                  block
-                                  icon={
-                                    <EyeOutlined />
-                                  }
-                                >
-                                  Receipt
-                                </Button>
-                              </Link>
-
-                              <Popconfirm
-                                title="Cancel this booking?"
-                                description="This action cannot be undone."
-                                okText="Cancel Booking"
-                                cancelText="Keep Booking"
-                                okButtonProps={{
-                                  danger: true,
-                                }}
-                                onConfirm={() =>
-                                  dispatch(
-                                    cancelBooking(
-                                      booking._id
-                                    )
-                                  )
-                                }
-                              >
-                                <Button
-                                  danger
-                                  block
-                                >
-                                  Cancel
-                                </Button>
-                              </Popconfirm>
-                            </>
-                          )}
-
-                          {status ===
-                            "ongoing" && (
+                      <div className="trip-dashboard-actions">
+                        {status ===
+                          "upcoming" && (
+                          <>
                             <Link
                               to={`/booking-success/${booking._id}`}
                             >
                               <Button
-                                type="primary"
                                 block
                                 icon={
                                   <EyeOutlined />
                                 }
                               >
-                                View Trip
+                                Receipt
                               </Button>
                             </Link>
-                          )}
 
-                          {status ===
-                            "completed" && (
-                            <>
+                            <Popconfirm
+                              title="Cancel this booking?"
+                              description="This action cannot be undone."
+                              okText="Cancel Booking"
+                              cancelText="Keep Booking"
+                              okButtonProps={{
+                                danger: true,
+                              }}
+                              onConfirm={() =>
+                                dispatch(
+                                  cancelBooking(
+                                    booking._id
+                                  )
+                                )
+                              }
+                            >
+                              <Button
+                                danger
+                                block
+                                icon={
+                                  <CloseCircleOutlined />
+                                }
+                              >
+                                Cancel
+                              </Button>
+                            </Popconfirm>
+                          </>
+                        )}
+
+                        {status ===
+                          "ongoing" && (
+                          <Link
+                            to={`/booking-success/${booking._id}`}
+                          >
+                            <Button
+                              block
+                              type="primary"
+                              icon={
+                                <EyeOutlined />
+                              }
+                            >
+                              View Active Trip
+                            </Button>
+                          </Link>
+                        )}
+
+                        {status ===
+                          "completed" && (
+                          <>
+                            <Button
+                              type="primary"
+                              block
+                              icon={
+                                <StarOutlined />
+                              }
+                              onClick={() =>
+                                openReviewModal(
+                                  booking
+                                )
+                              }
+                            >
+                              Leave Review
+                            </Button>
+
+                            <Link
+                              to={`/booking-success/${booking._id}`}
+                            >
+                              <Button
+                                block
+                                icon={
+                                  <EyeOutlined />
+                                }
+                              >
+                                Receipt
+                              </Button>
+                            </Link>
+                          </>
+                        )}
+
+                        {status ===
+                          "cancelled" &&
+                          booking.car?._id && (
+                            <Link
+                              to={`/booking/${booking.car._id}`}
+                            >
                               <Button
                                 type="primary"
                                 block
                                 icon={
-                                  <StarOutlined />
-                                }
-                                onClick={() =>
-                                  openReview(
-                                    booking
-                                  )
+                                  <ReloadOutlined />
                                 }
                               >
-                                Leave Review
+                                Book Again
                               </Button>
-
-                              {booking.car?._id && (
-                                <Link
-                                  to={`/bookingcar/${booking.car._id}`}
-                                >
-                                  <Button
-                                    block
-                                    icon={
-                                      <ReloadOutlined />
-                                    }
-                                  >
-                                    Book Again
-                                  </Button>
-                                </Link>
-                              )}
-                            </>
+                            </Link>
                           )}
-
-                          {status ===
-                            "cancelled" &&
-                            booking.car?._id && (
-                              <Link
-                                to={`/bookingcar/${booking.car._id}`}
-                              >
-                                <Button
-                                  type="primary"
-                                  block
-                                  icon={
-                                    <ReloadOutlined />
-                                  }
-                                >
-                                  Book Again
-                                </Button>
-                              </Link>
-                            )}
-                        </div>
                       </div>
-                    </Card>
-                  </Col>
+                    </div>
+                  </article>
                 );
               }
             )}
-          </Row>
+          </div>
         )}
 
         <ReviewModal
@@ -545,6 +762,7 @@ function UserBookings() {
           onSuccess={() => {
             setReviewOpen(false);
             setSelectedBooking(null);
+            dispatch(getAllBookings());
           }}
         />
       </section>
