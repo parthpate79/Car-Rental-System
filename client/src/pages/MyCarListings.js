@@ -79,8 +79,24 @@ const formatDate = (value) => {
   );
 };
 
+const normalizeStatus = (status) => {
+  if (status === "approved") {
+    return "approved";
+  }
+
+  if (status === "rejected") {
+    return "rejected";
+  }
+
+  if (status === "changes_requested") {
+    return "changes_requested";
+  }
+
+  return "pending";
+};
+
 const getStatusDetails = (status) => {
-  switch (status) {
+  switch (normalizeStatus(status)) {
     case "approved":
       return {
         color: "green",
@@ -142,8 +158,8 @@ function MyCarListings() {
 
   const listings = useSelector(
     (state) =>
-      state.listingReducer
-        ?.myListings || []
+      state.listingReducer?.myListings ||
+      []
   );
 
   const loading = useSelector(
@@ -162,21 +178,25 @@ function MyCarListings() {
 
       pending: listings.filter(
         (item) =>
-          item.status === "pending"
+          normalizeStatus(item.status) ===
+          "pending"
       ).length,
 
       approved: listings.filter(
         (item) =>
-          item.status === "approved"
+          normalizeStatus(item.status) ===
+          "approved"
       ).length,
 
-      actionRequired:
-        listings.filter((item) =>
+      actionRequired: listings.filter(
+        (item) =>
           [
             "rejected",
             "changes_requested",
-          ].includes(item.status)
-        ).length,
+          ].includes(
+            normalizeStatus(item.status)
+          )
+      ).length,
     };
   }, [listings]);
 
@@ -280,9 +300,7 @@ function MyCarListings() {
               </span>
 
               <div>
-                <Text>
-                  Total Requests
-                </Text>
+                <Text>Total Requests</Text>
 
                 <Title level={2}>
                   {statistics.total}
@@ -414,6 +432,11 @@ function MyCarListings() {
         ) : (
           <div className="owner-cards-grid">
             {listings.map((listing) => {
+              const statusName =
+                normalizeStatus(
+                  listing.status
+                );
+
               const status =
                 getStatusDetails(
                   listing.status
@@ -425,12 +448,12 @@ function MyCarListings() {
               const canResubmit = [
                 "rejected",
                 "changes_requested",
-              ].includes(listing.status);
+              ].includes(statusName);
 
               return (
                 <article
                   key={listing._id}
-                  className="owner-car-card"
+                  className={`owner-car-card ${statusName}`}
                 >
                   <div className="owner-car-image">
                     <img
@@ -526,7 +549,7 @@ function MyCarListings() {
                         </div>
                       </div>
 
-                      {listing.status ===
+                      {statusName ===
                         "approved" && (
                         <Alert
                           type="success"
@@ -543,7 +566,7 @@ function MyCarListings() {
                       {listing.adminRemark && (
                         <Alert
                           type={
-                            listing.status ===
+                            statusName ===
                             "rejected"
                               ? "error"
                               : "warning"

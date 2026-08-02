@@ -3,7 +3,7 @@ import axios from "axios";
 const api = axios.create({
   baseURL:
     process.env.REACT_APP_API_URL ||
-    "https://car-rental-system-dkt6.onrender.com",
+    "https://car-rental-system-letest.onrender.com",
   headers: {
     "Content-Type": "application/json",
   },

@@ -441,8 +441,7 @@ function DefaultLayout({ children }) {
                 <p>
                   Developed by{" "}
                   <strong>
-                    Parth Patel & Darshil
-                    Doshi
+                    Parth Patel
                   </strong>
                 </p>
               </Col>
