@@ -1,3 +1,4 @@
+import { safeReturnPath } from "../../utils/rental";
 import { message } from "antd";
 import api from "../../services/api";
 
@@ -21,7 +22,7 @@ export const userLogin = (reqObj) => async (dispatch) => {
     message.success(response.data.message || "Login successful");
 
     setTimeout(() => {
-      window.location.href = "/";
+      window.location.href = safeReturnPath(new URLSearchParams(window.location.search).get("next"));
     }, 500);
   } catch (error) {
     console.error("Login error:", error.response?.data || error.message);
@@ -56,7 +57,7 @@ export const userRegister = (reqObj) => async (dispatch) => {
     );
 
     setTimeout(() => {
-      window.location.href = "/login";
+      window.location.href = `/login${window.location.search}`;
     }, 500);
   } catch (error) {
     console.error(

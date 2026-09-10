@@ -1,3 +1,4 @@
+import { isBookedNow } from "../utils/rental";
 import React, {
   useCallback,
   useEffect,
@@ -6,6 +7,7 @@ import React, {
 } from "react";
 
 import {
+  Alert,
   Button,
   Card,
   Empty,
@@ -168,10 +170,7 @@ function AdminHome() {
     () =>
       cars.filter(
         (car) =>
-          Array.isArray(
-            car.bookedTimeSlots
-          ) &&
-          car.bookedTimeSlots.length > 0
+          isBookedNow(car)
       ).length,
     [cars]
   );
@@ -277,6 +276,7 @@ function AdminHome() {
 
     {
       title: "Capacity",
+      sorter: (a, b) => Number(a.capacity) - Number(b.capacity),
       dataIndex: "capacity",
       key: "capacity",
       width: 120,
@@ -290,6 +290,7 @@ function AdminHome() {
 
     {
       title: "Rental Price",
+      sorter: (a, b) => Number(a.rentPerHour) - Number(b.rentPerHour),
       dataIndex: "rentPerHour",
       key: "rentPerHour",
       width: 150,
@@ -330,16 +331,13 @@ function AdminHome() {
     },
 
     {
-      title: "Availability",
+      title: "Availability now",
       key: "status",
       width: 145,
 
       render: (_, car) => {
         const hasBookings =
-          Array.isArray(
-            car.bookedTimeSlots
-          ) &&
-          car.bookedTimeSlots.length > 0;
+          isBookedNow(car);
 
         return (
           <Tag
@@ -357,7 +355,7 @@ function AdminHome() {
             }
           >
             {hasBookings
-              ? "Has Bookings"
+              ? "On rent now"
               : "Available"}
           </Tag>
         );
@@ -397,6 +395,7 @@ function AdminHome() {
           >
             <Button
               danger
+              aria-label={`Delete ${car.name}`}
               icon={<DeleteOutlined />}
             />
           </Popconfirm>
@@ -410,6 +409,7 @@ function AdminHome() {
       {loading && <Spinner />}
 
       <section className="admin-dashboard-page">
+        {carsState.error && <Alert type="warning" showIcon message="Fleet data could not be refreshed" description="Displayed vehicles may be out of date. Try refreshing again." style={{ marginBottom: 20 }} action={<Button onClick={loadCars}>Retry</Button>} />}
         <AdminPageHero
           eyebrow="FLEET MANAGEMENT"
           title="Manage Rental Vehicles"
@@ -457,13 +457,13 @@ function AdminHome() {
               icon: <CarOutlined />,
             },
             {
-              label: "Available Cars",
+              label: "Available Now",
               value: availableCars,
               icon:
                 <CheckCircleOutlined />,
             },
             {
-              label: "Cars With Bookings",
+              label: "On Rent Now",
               value: bookedCars,
               icon:
                 <ClockCircleOutlined />,

@@ -4,6 +4,7 @@ import React from "react";
 import {
   createBrowserRouter,
   Navigate,
+  useLocation,
   RouterProvider,
 } from "react-router-dom";
 
@@ -38,6 +39,7 @@ const getStoredUser = () => {
 export const ProtectedRoute = ({
   children,
 }) => {
+  const location = useLocation();
   const user = getStoredUser();
   const token =
     localStorage.getItem("token");
@@ -45,7 +47,7 @@ export const ProtectedRoute = ({
   if (!user || !token) {
     return (
       <Navigate
-        to="/login"
+        to={`/login?next=${encodeURIComponent(location.pathname + location.search)}`}
         replace
       />
     );
@@ -57,6 +59,7 @@ export const ProtectedRoute = ({
 export const AdminRoute = ({
   children,
 }) => {
+  const location = useLocation();
   const user = getStoredUser();
   const token =
     localStorage.getItem("token");
@@ -64,7 +67,7 @@ export const AdminRoute = ({
   if (!user || !token) {
     return (
       <Navigate
-        to="/login"
+        to={`/login?next=${encodeURIComponent(location.pathname + location.search)}`}
         replace
       />
     );
@@ -85,23 +88,46 @@ export const AdminRoute = ({
 function NotFound() {
   return (
     <div className="not-found-page">
-      <h1>404</h1>
+      <div className="not-found-icon">
+        <span>🚗</span>
+        <div className="not-found-road" />
+      </div>
 
-      <h2>Page not found</h2>
+      <div className="not-found-badge">404</div>
 
-      <p>
-        The page you requested does not
-        exist.
+      <h1 className="not-found-title">
+        Oops! Wrong turn taken.
+      </h1>
+
+      <p className="not-found-desc">
+        The page you're looking for doesn't exist or has been moved.
+        Let's get you back on the right road.
       </p>
 
-      <button
-        className="btn1"
-        onClick={() => {
-          window.location.href = "/";
-        }}
-      >
-        Return Home
-      </button>
+      <div className="not-found-actions">
+        <button
+          className="not-found-primary-btn"
+          onClick={() => {
+            window.location.href = "/";
+          }}
+        >
+          🏠 Return Home
+        </button>
+
+        <button
+          className="not-found-secondary-btn"
+          onClick={() => window.history.back()}
+        >
+          ← Go Back
+        </button>
+      </div>
+
+      <p className="not-found-help">
+        Need help?{" "}
+        <a href="/">
+          Explore available cars
+        </a>
+      </p>
     </div>
   );
 }
@@ -111,9 +137,7 @@ const router = createBrowserRouter([
     path: "/",
 
     element: (
-      <ProtectedRoute>
-        <Home />
-      </ProtectedRoute>
+      <Home />
     ),
   },
 

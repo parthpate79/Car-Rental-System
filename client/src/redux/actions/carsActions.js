@@ -11,6 +11,7 @@ export const getAllCars = () => async (dispatch) => {
     payload: true,
   });
 
+  dispatch({ type: "CARS_LOADING" });
   try {
     const response = await api.get(
       "/api/cars/getallcars"
@@ -20,7 +21,7 @@ export const getAllCars = () => async (dispatch) => {
       ? response.data
       : response.data?.data?.cars || [];
 
-    console.log("Cars received:", cars);
+
 
     dispatch({
       type: "GET_ALL_CARS",
@@ -35,8 +36,8 @@ export const getAllCars = () => async (dispatch) => {
     );
 
     dispatch({
-      type: "GET_ALL_CARS",
-      payload: [],
+      type: "CARS_ERROR",
+      payload: "Unable to load the fleet",
     });
 
     message.error(

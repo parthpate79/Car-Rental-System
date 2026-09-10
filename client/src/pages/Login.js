@@ -1,3 +1,4 @@
+import { safeReturnPath } from "../utils/rental";
 import React from "react";
 
 import {
@@ -52,7 +53,7 @@ function Login() {
   const user = localStorage.getItem("user");
 
   if (token && user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to={safeReturnPath(new URLSearchParams(window.location.search).get("next"))} replace />;
   }
 
   const onFinish = (values) => {
@@ -65,7 +66,7 @@ function Login() {
   };
 
   return (
-    <main className="auth-page">
+    <main className="auth-page"><Link to="/" className="auth-browse-link">← Explore cars without signing in</Link>
       {loading && <Spinner />}
 
       <div className="auth-background-shape auth-shape-one" />
@@ -108,7 +109,7 @@ function Login() {
                 </Title>
 
                 <Paragraph>
-                  Discover verified vehicles, flexible
+                  Explore rental vehicles, flexible
                   booking periods and a smooth rental
                   experience from one secure platform.
                 </Paragraph>
@@ -116,7 +117,7 @@ function Login() {
                 <div className="auth-feature-list">
                   <span>
                     <CheckCircleOutlined />
-                    Verified premium vehicles
+                    Cars for different journeys
                   </span>
 
                   <span>
@@ -245,7 +246,7 @@ function Login() {
                 </div>
 
                 <Link
-                  to="/register"
+                  to={`/register${window.location.search}`}
                   className="auth-secondary-link"
                 >
                   Create a new account

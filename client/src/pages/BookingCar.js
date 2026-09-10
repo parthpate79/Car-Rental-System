@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import React, {
   useEffect,
   useMemo,
@@ -36,7 +37,6 @@ import {
   useSelector,
 } from "react-redux";
 import { useLoaderData } from "react-router-dom";
-import StripeCheckout from "react-stripe-checkout";
 
 import DefaultLayout from "../components/DefaultLayout";
 import Spinner from "../components/Spinner";
@@ -69,8 +69,11 @@ function BookingCar() {
     [carsState?.cars]
   );
 
-  const [selectedRange, setSelectedRange] =
-    useState(null);
+  const [selectedRange, setSelectedRange] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const from = Number(params.get('from')), to = Number(params.get('to'));
+    return from > Date.now() && to > from ? [dayjs(from), dayjs(to)] : null;
+  });
 
   const [driverRequired, setDriverRequired] =
     useState(false);
@@ -226,17 +229,13 @@ function BookingCar() {
     );
   };
 
-  const handleStripeToken = (token) => {
-    dispatch(
-      bookCar(createRequestObject(token))
-    );
-  };
 
   const canBook =
     Boolean(car) &&
     Boolean(selectedRange) &&
     bookingSummary.totalHours >= 1 &&
-    !hasBookingConflict;
+    !hasBookingConflict &&
+    selectedRange[0].valueOf() > Date.now() && !loading;
 
   if (!car && !loading) {
     return (
@@ -391,7 +390,7 @@ function BookingCar() {
                 </div>
               </div>
 
-              <RangePicker
+              <RangePicker value={selectedRange}
                 className="booking-range-picker"
                 showTime={{
                   format: "HH:mm",
@@ -425,6 +424,8 @@ function BookingCar() {
                   description="This car already has a booking that overlaps with the selected pickup and return time."
                 />
               )}
+
+              {selectedRange && selectedRange[0].valueOf() <= Date.now() && <Alert type="warning" showIcon message="Choose a pickup time in the future" style={{ marginTop: 16 }} />}
 
               {selectedRange && (
                 <>
@@ -552,13 +553,13 @@ function BookingCar() {
                       Pay at Pickup
                     </Radio.Button>
 
-                    <Radio.Button value="card">
+                    <Radio.Button value="card" disabled>
                       <CreditCardOutlined />
-                      Card Payment
+                      Card payment (not available)
                     </Radio.Button>
                   </Radio.Group>
 
-                  {paymentMethod === "pay_at_pickup" ? (
+                  {(
                     <Button
                       type="primary"
                       block
@@ -570,44 +571,11 @@ function BookingCar() {
                     >
                       Confirm Booking
                     </Button>
-                  ) : (
-                    <StripeCheckout
-                      shippingAddress
-                      billingAddress
-                      name="DriveEase Car Rental"
-                      description={`${car?.name} booking`}
-                      token={handleStripeToken}
-                      currency="INR"
-                      amount={
-                        bookingSummary.totalAmount *
-                        100
-                      }
-                      stripeKey={
-                        process.env
-                          .REACT_APP_STRIPE_PUBLIC_KEY ||
-                        "pk_test_51NFtVGSAZAXtdYSkpJntFLfuU3dQNlk1BVqldJWCWQUyDqAtoE1wHVhRCB2GEnGurggdZOd1L08afXnaMN0H7qcO00yUPQevQp"
-                      }
-                    >
-                      <Button
-                        type="primary"
-                        block
-                        size="large"
-                        disabled={!canBook}
-                        className="booking-submit-button"
-                        icon={<CreditCardOutlined />}
-                      >
-                        Pay ₹
-                        {bookingSummary.totalAmount.toLocaleString(
-                          "en-IN"
-                        )}
-                      </Button>
-                    </StripeCheckout>
-                  )}
+                  )
+                  }
 
                   <Text className="payment-security-text">
-                    <SafetyCertificateOutlined /> Card
-                    details are handled securely by Stripe
-                    test checkout.
+                    <SafetyCertificateOutlined /> Reserve now and pay at pickup. No online charge.
                   </Text>
                 </>
               )}

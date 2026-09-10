@@ -64,6 +64,7 @@ app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
     message: "DriveEase Car Rental API is running",
+    release: process.env.RENDER_GIT_COMMIT || "local",
   });
 });
 

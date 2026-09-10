@@ -17,24 +17,18 @@ import {
   Row,
   Select,
   Space,
-  Upload,
   Spin,
   Steps,
   Typography,
 } from "antd";
 
 import {
-  BankOutlined,
   CarOutlined,
   CheckCircleOutlined,
   EnvironmentOutlined,
   FileProtectOutlined,
-  IdcardOutlined,
   MailOutlined,
   PhoneOutlined,
-  PictureOutlined,
-  PlusOutlined,
-  SafetyCertificateOutlined,
   SendOutlined,
   UserOutlined,
 } from "@ant-design/icons";

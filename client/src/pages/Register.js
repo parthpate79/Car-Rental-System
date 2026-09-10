@@ -292,7 +292,7 @@ function Register() {
                 </div>
 
                 <Link
-                  to="/login"
+                  to={`/login${window.location.search}`}
                   className="auth-secondary-link"
                 >
                   Login to your account

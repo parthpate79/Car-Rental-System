@@ -95,7 +95,7 @@ router.post("/bookcar", protect, async (req, res) => {
 
     const selectedCar = await Car.findById(carId);
 
-    if (!selectedCar) {
+    if (!selectedCar || selectedCar.isActive === false || selectedCar.isPublic === false) {
       return res.status(404).json({
         success: false,
         message: "Selected car was not found",
@@ -179,32 +179,15 @@ const ownerEarning =
     ? baseAmount - platformCommission
     : 0;
 
-    const selectedPaymentMethod =
-      paymentMethod === "card"
-        ? "card"
-        : "pay_at_pickup";
-
-    let paymentStatus = "pending";
-    let transactionId = "";
-
-    if (selectedPaymentMethod === "card") {
-      if (!token?.id) {
-        return res.status(400).json({
-          success: false,
-          message:
-            "Card payment token is missing",
-        });
-      }
-
-      /*
-        Current project uses Stripe test checkout.
-        This stores the test token as the transaction ID.
-        Real production payment verification can be
-        integrated later with Stripe Payment Intents.
-      */
-      transactionId = token.id;
-      paymentStatus = "paid";
+    if (typeof driverRequired !== "boolean") {
+      return res.status(400).json({ success: false, message: "Invalid driver option" });
     }
+    if (paymentMethod !== "pay_at_pickup") {
+      return res.status(400).json({ success: false, message: "Online payments are not available. Please choose Pay at Pickup." });
+    }
+    const selectedPaymentMethod = "pay_at_pickup";
+    const paymentStatus = "pending";
+    const transactionId = "";
 
     const newBooking = await Booking.create({
       car: selectedCar._id,

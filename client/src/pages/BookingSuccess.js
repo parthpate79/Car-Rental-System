@@ -60,6 +60,66 @@ const formatDateTime = (value) => {
   });
 };
 
+// Countdown Timer component
+function PickupCountdown({ pickupTime }) {
+  const [timeLeft, setTimeLeft] = useState(null);
+
+  useEffect(() => {
+    if (!pickupTime) return;
+
+    const target = new Date(pickupTime).getTime();
+
+    const calc = () => {
+      const diff = target - Date.now();
+      if (diff <= 0) {
+        setTimeLeft(null);
+        return;
+      }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      setTimeLeft({ days, hours, minutes, seconds });
+    };
+
+    calc();
+    const interval = setInterval(calc, 1000);
+    return () => clearInterval(interval);
+  }, [pickupTime]);
+
+  if (!timeLeft) return null;
+
+  return (
+    <div className="pickup-countdown">
+      <div className="countdown-label">
+        <ClockCircleOutlined />
+        <span>Time until pickup</span>
+      </div>
+      <div className="countdown-tiles">
+        <div className="countdown-tile">
+          <strong>{String(timeLeft.days).padStart(2, "0")}</strong>
+          <small>Days</small>
+        </div>
+        <div className="countdown-separator">:</div>
+        <div className="countdown-tile">
+          <strong>{String(timeLeft.hours).padStart(2, "0")}</strong>
+          <small>Hours</small>
+        </div>
+        <div className="countdown-separator">:</div>
+        <div className="countdown-tile">
+          <strong>{String(timeLeft.minutes).padStart(2, "0")}</strong>
+          <small>Mins</small>
+        </div>
+        <div className="countdown-separator">:</div>
+        <div className="countdown-tile">
+          <strong>{String(timeLeft.seconds).padStart(2, "0")}</strong>
+          <small>Secs</small>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function BookingSuccess() {
   const { bookingId } = useParams();
 
@@ -72,6 +132,14 @@ function BookingSuccess() {
 
   const [loading, setLoading] =
     useState(true);
+
+  // Set page title
+  useEffect(() => {
+    document.title = "Booking Confirmed — DriveEase";
+    return () => {
+      document.title = "DriveEase";
+    };
+  }, []);
 
   useEffect(() => {
     const loadBooking = async () => {
@@ -144,6 +212,9 @@ function BookingSuccess() {
             {booking.bookingStatus}
           </Tag>
         </div>
+
+        {/* Live countdown to pickup */}
+        <PickupCountdown pickupTime={booking.bookedTimeSlots?.from} />
 
         <Card
           bordered={false}
@@ -252,6 +323,22 @@ function BookingSuccess() {
                     {booking.paymentStatus}
                   </strong>
                 </div>
+
+                <div>
+                  <DollarCircleOutlined />
+                  <span>Rate</span>
+                  <strong>
+                    ₹{formatMoney(booking.rentPerHour)}/hr
+                  </strong>
+                </div>
+
+                <div>
+                  <CarOutlined />
+                  <span>Booking Status</span>
+                  <strong>
+                    {booking.bookingStatus}
+                  </strong>
+                </div>
               </div>
             </Col>
           </Row>
@@ -293,7 +380,7 @@ function BookingSuccess() {
             </div>
 
             <div>
-              <span>Service Fee</span>
+              <span>Service Fee (3%)</span>
 
               <strong>
                 ₹
@@ -326,6 +413,20 @@ function BookingSuccess() {
               </strong>
             </div>
           )}
+
+          {/* Important reminder */}
+          <div className="receipt-reminder no-print">
+            <SafetyCertificateOutlined />
+            <div>
+              <strong>Pickup Reminder</strong>
+              <p>
+                Please carry a valid government-issued ID at the time of pickup.
+                {booking.paymentMethod === "pay_at_pickup"
+                  ? " Payment is to be made in cash at pickup."
+                  : " Payment has been processed online."}
+              </p>
+            </div>
+          </div>
 
           <div className="receipt-actions no-print">
             <Button

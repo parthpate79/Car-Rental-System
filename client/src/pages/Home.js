@@ -1,15 +1,19 @@
+import dayjs from "dayjs";
 import CustomerReviews from "../components/CustomerReviews";
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  Alert,
   Button,
   Card,
   Col,
+  Collapse,
   DatePicker,
   Empty,
   Input,
   Row,
   Select,
+  Skeleton,
   Slider,
   Tag,
   Typography,
@@ -18,22 +22,104 @@ import {
   CarOutlined,
   ClockCircleOutlined,
   FilterOutlined,
+  QuestionCircleOutlined,
   ReloadOutlined,
   SafetyCertificateOutlined,
   SearchOutlined,
+  StarOutlined,
   TeamOutlined,
   ThunderboltOutlined,
 } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 
 import DefaultLayout from "../components/DefaultLayout";
-import Spinner from "../components/Spinner";
 import { getAllCars } from "../redux/actions/carsActions";
 
 const { RangePicker } = DatePicker;
 const { Title, Paragraph, Text } = Typography;
+const { Panel } = Collapse;
 
 const MAX_RENT = 10000;
+
+// Derive a category badge from car capacity
+function getCarCategory(capacity) {
+  const seats = Number(capacity);
+  if (seats <= 0 || isNaN(seats)) return null;
+  return { label: `${seats} seats`, color: "#176b5b" };
+}
+
+// FAQ data
+const FAQ_ITEMS = [
+  {
+    key: "1",
+    label: "How do I book a car on DriveEase?",
+    children:
+      "Select your desired pickup and return dates using the date picker on the Home page, then browse the available cars. Click 'View & Book' on any car, review the pricing breakdown and confirm your booking. You'll receive an instant booking confirmation.",
+  },
+  {
+    key: "2",
+    label: "Can I cancel my booking?",
+    children:
+      "Yes! You can cancel any active booking from the 'My Bookings' page before your pickup time. Click 'Cancel Booking' next to your reservation and it will be cancelled immediately.",
+  },
+  {
+    key: "3",
+    label: "What payment methods are accepted?",
+    children:
+      "Choose Pay at Pickup to reserve your car and pay when you collect it. Online card payments are not currently available. Review the total before confirming.",
+  },
+  {
+    key: "4",
+    label: "Is a professional driver available?",
+    children:
+      "Yes! During the booking process you can add a professional driver for just ₹30 per hour. The driver charge is included in your total booking amount shown in the price breakdown.",
+  },
+  {
+    key: "5",
+    label: "How do I list my own car on DriveEase?",
+    children:
+      "If you own a car and want to earn by renting it out, navigate to 'List Your Car' in the top navigation. Fill in your car details, upload photos and submit. Our admin team reviews each submission. Track its status in My Listings.",
+  },
+  {
+    key: "6",
+    label: "How is the rental price calculated?",
+    children:
+      "The price is calculated based on your rental duration (in hours). Partial hours are rounded up. Total = (Hours × Rate/hour) + Optional Driver Charge + 3% Service Fee. The full breakdown is shown before you confirm your booking — no hidden charges.",
+  },
+];
+
+// How It Works steps
+const HOW_IT_WORKS_STEPS = [
+  {
+    step: "01",
+    icon: <SearchOutlined />,
+    title: "Search & Filter",
+    desc: "Select your pickup and return dates, choose fuel type, seating capacity and price range to find the perfect car.",
+  },
+  {
+    step: "02",
+    icon: <CarOutlined />,
+    title: "Choose & Book",
+    desc: "Pick your favourite vehicle, review the transparent price breakdown and confirm your reservation in seconds.",
+  },
+  {
+    step: "03",
+    icon: <StarOutlined />,
+    title: "Drive & Enjoy",
+    desc: "Collect your car at the agreed time, enjoy your journey and return it hassle-free. Leave a review to help others.",
+  },
+];
+
+function SkeletonCarCard() {
+  return (
+    <Card className="premium-car-card skeleton-card" bordered={false}>
+      <Skeleton.Image active className="skeleton-car-image" />
+      <div className="skeleton-card-body">
+        <Skeleton active paragraph={{ rows: 3 }} />
+      </div>
+    </Card>
+  );
+}
 
 function Home() {
   const dispatch = useDispatch();
@@ -50,10 +136,16 @@ function Home() {
 
   const [searchText, setSearchText] = useState("");
   const [fuelType, setFuelType] = useState("all");
+  const [location, setLocation] = useState("all");
   const [capacity, setCapacity] = useState("all");
   const [sortOrder, setSortOrder] = useState("default");
   const [maximumRent, setMaximumRent] = useState(MAX_RENT);
   const [selectedRange, setSelectedRange] = useState(null);
+
+  // Set page title
+  useEffect(() => {
+    document.title = "DriveEase — Find & Book Premium Rental Cars";
+  }, []);
 
   useEffect(() => {
     dispatch(getAllCars());
@@ -73,6 +165,8 @@ function Home() {
       value: fuel,
     }));
   }, [cars]);
+
+  const locationOptions = useMemo(() => [...new Set(cars.map(car => car.location).filter(Boolean))].sort().map(city => ({ label: city, value: city })), [cars]);
 
   const capacityOptions = useMemo(() => {
     const uniqueCapacities = [
@@ -102,6 +196,7 @@ function Home() {
     setMaximumRent(maximumAvailableRent);
   }, [maximumAvailableRent]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const isCarAvailable = (car) => {
     if (!selectedRange) {
       return true;
@@ -124,9 +219,6 @@ function Home() {
         return false;
       }
 
-      // Two ranges overlap when:
-      // selected start is before booked end
-      // and selected end is after booked start.
       return selectedFrom < bookedTo && selectedTo > bookedFrom;
     });
   };
@@ -147,6 +239,8 @@ function Home() {
         (car) => car.fuelType === fuelType
       );
     }
+
+    if (location !== "all") result = result.filter(car => car.location === location);
 
     if (capacity !== "all") {
       result = result.filter(
@@ -186,10 +280,12 @@ function Home() {
     }
 
     return result;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     cars,
     searchText,
     fuelType,
+    location,
     capacity,
     maximumRent,
     selectedRange,
@@ -224,6 +320,7 @@ function Home() {
   const resetFilters = () => {
     setSearchText("");
     setFuelType("all");
+    setLocation("all");
     setCapacity("all");
     setSortOrder("default");
     setMaximumRent(maximumAvailableRent);
@@ -232,7 +329,7 @@ function Home() {
 
   return (
     <DefaultLayout>
-      {loading && <Spinner />}
+
 
       {/* Hero Section */}
       <section className="home-hero">
@@ -240,17 +337,17 @@ function Home() {
 
         <div className="home-hero-content">
           <Tag className="hero-badge">
-            Premium Car Rental Experience
+            YOUR NEXT JOURNEY STARTS HERE
           </Tag>
 
           <Title className="hero-title">
-            Find the perfect car for every journey
+            Good plans. Great drives.
           </Title>
 
           <Paragraph className="hero-description">
-            Choose from premium, luxury, sports and family cars.
-            Book securely and manage your complete rental journey
-            from one convenient platform.
+            A weekend escape, a family visit, or the everyday commute.
+            Find a car that fits your plans, with clear hourly pricing
+            and your trip details in one place.
           </Paragraph>
 
           <div className="hero-actions">
@@ -289,9 +386,9 @@ function Home() {
 
               <div>
                 <Title level={2}>
-                  {cars.length}+
+                  {cars.length}
                 </Title>
-                <Text>Total Premium Cars</Text>
+                <Text>Cars in the fleet</Text>
               </div>
             </Card>
           </Col>
@@ -303,8 +400,8 @@ function Home() {
               </div>
 
               <div>
-                <Title level={2}>24/7</Title>
-                <Text>Customer Support</Text>
+                <Title level={2}>Hourly</Title>
+                <Text>Flexible rental periods</Text>
               </div>
             </Card>
           </Col>
@@ -316,8 +413,8 @@ function Home() {
               </div>
 
               <div>
-                <Title level={2}>100%</Title>
-                <Text>Secure Booking</Text>
+                <Title level={2}>Upfront</Title>
+                <Text>Price breakdown</Text>
               </div>
             </Card>
           </Col>
@@ -329,8 +426,8 @@ function Home() {
               </div>
 
               <div>
-                <Title level={2}>Fast</Title>
-                <Text>Instant Reservation</Text>
+                <Title level={2}>One place</Title>
+                <Text>Bookings & receipts</Text>
               </div>
             </Card>
           </Col>
@@ -338,7 +435,7 @@ function Home() {
       </section>
 
       {/* Search and Filters */}
-      <section className="filter-section">
+      <section id="available-cars" className="filter-section">
         <div className="section-heading">
           <div>
             <Text className="section-label">
@@ -372,6 +469,7 @@ function Home() {
 
               <RangePicker
                 className="full-width-control"
+                value={selectedRange ? selectedRange.map(value => dayjs(value)) : null}
                 showTime={{
                   format: "HH:mm",
                   minuteStep: 15,
@@ -392,6 +490,7 @@ function Home() {
               </Text>
 
               <Input
+                aria-label="Search cars by name"
                 className="full-width-control"
                 prefix={<SearchOutlined />}
                 placeholder="Search by car name"
@@ -439,6 +538,11 @@ function Home() {
                   ...capacityOptions,
                 ]}
               />
+            </Col>
+
+            <Col lg={8} md={12} xs={24}>
+              <Text className="filter-label">Pickup city</Text>
+              <Select aria-label="Pickup city" className="full-width-control" value={location} onChange={setLocation} options={[{ label: "All pickup cities", value: "all" }, ...locationOptions]} />
             </Col>
 
             <Col lg={8} md={12} xs={24}>
@@ -494,7 +598,7 @@ function Home() {
 
       {/* Car Listing */}
       <section
-        id="available-cars"
+        id="fleet-results"
         className="cars-section"
       >
         <div className="section-heading">
@@ -513,7 +617,17 @@ function Home() {
           </div>
         </div>
 
-        {filteredCars.length === 0 ? (
+        {carsState.error && <Alert type="warning" showIcon message="We couldn’t load the fleet" description="The rental service may be waking up. Please try again in a moment." action={<Button onClick={() => dispatch(getAllCars())}>Try again</Button>} style={{ marginBottom: 24 }} />}
+        {/* Skeleton loading while fetching */}
+        {loading && cars.length === 0 ? (
+          <Row gutter={[24, 24]} className="car-grid">
+            {[1, 2, 3, 4].map((n) => (
+              <Col xl={8} lg={8} md={12} sm={24} xs={24} key={n}>
+                <SkeletonCarCard />
+              </Col>
+            ))}
+          </Row>
+        ) : filteredCars.length === 0 ? (
           <Card className="empty-state-card" bordered={false}>
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -541,148 +655,207 @@ function Home() {
           </Card>
         ) : (
           <Row gutter={[24, 24]} className="car-grid">
-  {filteredCars.map((car, index) => {
-    const available = isCarAvailable(car);
+            {filteredCars.map((car, index) => {
+              const available = isCarAvailable(car);
+              const category = getCarCategory(car.capacity);
 
-    return (
-      <Col
-        xl={6}
-        lg={8}
-        md={12}
-        sm={12}
-        xs={24}
-        key={car._id}
-        className="car-grid-column"
-      >
-        <Card
-          className="premium-car-card"
-          bordered={false}
-          style={{
-            animationDelay: `${index * 80}ms`,
-          }}
-          cover={
-            <div className="car-image-wrapper">
-              <img
-                src={
-                  car.image ||
-                  "https://placehold.co/600x400?text=DriveEase"
-                }
-                alt={`${car.name} rental car`}
-                className="car-card-image"
-              />
-
-              <div className="car-image-overlay" />
-
-              <div className="car-card-shine" />
-
-              <Tag
-                className="availability-tag"
-                color={available ? "green" : "red"}
-              >
-                {available ? "Available" : "Booked"}
-              </Tag>
-
-              <div className="car-floating-price">
-                ₹{Number(car.rentPerHour || 0).toLocaleString("en-IN")}
-                <small>/hr</small>
-              </div>
-            </div>
-          }
-        >
-          <div className="car-card-content">
-            <div className="car-card-top">
-              <div className="car-title-area">
-                <Title
-                  level={3}
-                  className="car-name"
-                  title={car.name}
+              return (
+                <Col
+                  xl={6}
+                  lg={8}
+                  md={12}
+                  sm={12}
+                  xs={24}
+                  key={car._id}
+                  className="car-grid-column"
                 >
-                  {car.name}
-                </Title>
+                  <Card
+                    className="premium-car-card"
+                    bordered={false}
+                    style={{
+                      animationDelay: `${index * 80}ms`,
+                    }}
+                    cover={
+                      <div className="car-image-wrapper">
+                        <img
+                          src={
+                            car.image ||
+                            "https://placehold.co/600x400?text=DriveEase"
+                          }
+                          alt={`${car.name} rental car`}
+                          className="car-card-image"
+                          loading="lazy"
+                        />
 
-                <Text className="car-category-text">
-                  Premium Rental Vehicle
-                </Text>
-              </div>
+                        <div className="car-image-overlay" />
+                        <div className="car-card-shine" />
 
-              <div className="car-specification-grid">
-                <div className="car-specification">
-                  <div className="specification-icon">
-                    <TeamOutlined />
-                  </div>
+                        {/* Hover overlay with quick specs */}
+                        <div className="car-hover-overlay">
+                          <div className="car-hover-spec">
+                            <TeamOutlined />
+                            <span>{car.capacity || "-"} Seats</span>
+                          </div>
+                          <div className="car-hover-spec">
+                            <ThunderboltOutlined />
+                            <span>{car.fuelType || "N/A"}</span>
+                          </div>
+                          <div className="car-hover-spec">
+                            <ClockCircleOutlined />
+                            <span>₹{Number(car.rentPerHour || 0).toLocaleString("en-IN")}/hr</span>
+                          </div>
+                        </div>
 
-                  <div className="specification-text">
-                    <small>Capacity</small>
-                    <strong>
-                      {car.capacity || "-"} Seats
-                    </strong>
-                  </div>
-                </div>
+                        <Tag
+                          className="availability-tag"
+                          color={available ? "green" : "red"}
+                        >
+                          {!selectedRange ? "Select dates" : available ? "Available for your dates" : "Booked"}
+                        </Tag>
 
-                <div className="car-specification">
-                  <div className="specification-icon">
-                    <ThunderboltOutlined />
-                  </div>
+                        {/* Category badge */}
+                        {category && (
+                          <div
+                            className="car-category-badge"
+                            style={{ background: category.color }}
+                          >
+                            {category.label}
+                          </div>
+                        )}
 
-                  <div className="specification-text">
-                    <small>Fuel Type</small>
-                    <strong>
-                      {car.fuelType || "Not specified"}
-                    </strong>
-                  </div>
-                </div>
-              </div>
-            </div>
+                        <div className="car-floating-price">
+                          ₹{Number(car.rentPerHour || 0).toLocaleString("en-IN")}
+                          <small>/hr</small>
+                        </div>
+                      </div>
+                    }
+                  >
+                    <div className="car-card-content">
+                      <div className="car-card-top">
+                        <div className="car-title-area">
+                          <Title
+                            level={3}
+                            className="car-name"
+                            title={car.name}
+                          >
+                            {car.name}
+                          </Title>
 
-            <div className="car-card-bottom">
-              <div className="car-price-row">
-                <div>
-                  <Text type="secondary">
-                    Rental price
-                  </Text>
+                          <Text className="car-category-text">
+                            {car.location || "Pickup details on booking"} · {car.transmission || "Transmission not specified"}
+                          </Text>
+                        </div>
 
-                  <div className="car-price">
-                    ₹
-                    {Number(
-                      car.rentPerHour || 0
-                    ).toLocaleString("en-IN")}
+                        <div className="car-specification-grid">
+                          <div className="car-specification">
+                            <div className="specification-icon">
+                              <TeamOutlined />
+                            </div>
 
-                    <small>/hour</small>
-                  </div>
-                </div>
+                            <div className="specification-text">
+                              <small>Capacity</small>
+                              <strong>
+                                {car.capacity || "-"} Seats
+                              </strong>
+                            </div>
+                          </div>
 
-                <div className="car-status-circle">
-                  <CarOutlined />
-                </div>
-              </div>
+                          <div className="car-specification">
+                            <div className="specification-icon">
+                              <ThunderboltOutlined />
+                            </div>
 
-              <Link
-                to={`/booking/${car._id}`}
-                className="full-width-link"
-              >
-                <Button
-                  type="primary"
-                  size="large"
-                  block
-                  icon={<CarOutlined />}
-                  disabled={
-                    selectedRange && !available
-                  }
-                  className="car-booking-button"
-                >
-                  {selectedRange && !available
-                    ? "Not Available"
-                    : "View & Book"}
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </Card>
-      </Col>
-    );
-  })}
-</Row>
+                            <div className="specification-text">
+                              <small>Fuel Type</small>
+                              <strong>
+                                {car.fuelType || "Not specified"}
+                              </strong>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="car-card-bottom">
+                        <div className="car-price-row">
+                          <div>
+                            <Text type="secondary">
+                              Rental price
+                            </Text>
+
+                            <div className="car-price">
+                              ₹
+                              {Number(
+                                car.rentPerHour || 0
+                              ).toLocaleString("en-IN")}
+
+                              <small>/hour</small>
+                            </div>
+                          </div>
+
+                          <div className="car-status-circle">
+                            <CarOutlined />
+                          </div>
+                        </div>
+
+                        <Link
+                          to={`/booking/${car._id}${selectedRange ? `?from=${selectedRange[0]}&to=${selectedRange[1]}` : ""}`}
+                          className="full-width-link"
+                        >
+                          <Button
+                            type="primary"
+                            size="large"
+                            block
+                            icon={<CarOutlined />}
+                            disabled={
+                              selectedRange && !available
+                            }
+                            className="car-booking-button"
+                          >
+                            {selectedRange && !available
+                              ? "Not Available"
+                              : "View & Book"}
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </Card>
+                </Col>
+              );
+            })}
+          </Row>
         )}
+      </section>
+
+      {/* How It Works */}
+      <section id="rental-guide" className="how-it-works-section">
+        <div className="centered-section-heading">
+          <Text className="section-label">
+            SIMPLE PROCESS
+          </Text>
+
+          <Title level={2}>
+            How DriveEase works
+          </Title>
+
+          <Paragraph>
+            Getting on the road has never been easier.
+            Follow these three simple steps.
+          </Paragraph>
+        </div>
+
+        <div className="how-it-works-steps">
+          {HOW_IT_WORKS_STEPS.map((step, i) => (
+            <div className="how-step-card" key={step.step}>
+              <div className="how-step-number">{step.step}</div>
+              <div className="how-step-icon">{step.icon}</div>
+              <Title level={4}>{step.title}</Title>
+              <Paragraph>{step.desc}</Paragraph>
+              {i < HOW_IT_WORKS_STEPS.length - 1 && (
+                <div className="how-step-connector" aria-hidden="true" />
+              )}
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Why Choose Us */}
@@ -748,8 +921,53 @@ function Home() {
             </Card>
           </Col>
         </Row>
-        
       </section>
+
+      {/* FAQ Section */}
+      <section id="rental-faq" className="faq-section">
+        <div className="centered-section-heading">
+          <Text className="section-label">
+            GOT QUESTIONS?
+          </Text>
+
+          <Title level={2}>
+            Frequently Asked Questions
+          </Title>
+
+          <Paragraph>
+            Everything you need to know about renting, booking and
+            listing your car on DriveEase.
+          </Paragraph>
+        </div>
+
+        <div className="faq-container">
+          <Collapse
+            accordion
+            bordered={false}
+            className="faq-collapse"
+            expandIcon={({ isActive }) => (
+              <QuestionCircleOutlined
+                style={{
+                  fontSize: 18,
+                  color: isActive ? "#2563eb" : "#64748b",
+                  transition: "color 0.2s",
+                }}
+              />
+            )}
+          >
+            {FAQ_ITEMS.map((item) => (
+              <Panel
+                key={item.key}
+                header={item.label}
+                className="faq-panel"
+              >
+                <p>{item.children}</p>
+              </Panel>
+            ))}
+          </Collapse>
+        </div>
+      </section>
+
       <CustomerReviews />
     </DefaultLayout>
   );

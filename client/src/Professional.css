@@ -1,0 +1,120 @@
+/* DriveEase: a quiet, consistent visual system for the rental journey. */
+:root { --primary: #176b5b; --primary-dark: #105346; --primary-light: #e9f3ed; --secondary: #176b5b; --background: #f7f8f5; --dark: #182c28; --text: #344840; --muted: #6a7770; --border: #dfe5df; }
+body, .ant-typography, .ant-btn { font-family: Inter, Arial, sans-serif; }
+.site-container { width: min(1280px, calc(100% - 64px)); margin: 0 auto; }
+.application-layout .modern-header { background: #fff; border-bottom: 1px solid var(--border); box-shadow: none; }
+.application-layout .navbar-container { min-height: 88px; }
+.application-layout .brand-text h2 { color: #182c28; font-size: 25px; letter-spacing: -1px; }
+.application-layout .brand-text > span { color: #6a7770; font-size: 10px; letter-spacing: .7px; }
+.brand-dot { color: #176b5b; }
+.application-layout .brand-text h2 .brand-dot { display: inline; font-size: inherit; color: #176b5b; }
+.application-layout .navbar-container.site-container { width: min(1280px, calc(100% - 64px)); }
+.application-layout .navigation-link.active { box-shadow: none; }
+.auth-browse-link { position: absolute; top: 24px; left: 28px; color: #176b5b; font-size: 13px; z-index: 2; }
+.admin-application-layout .admin-page-hero { background: #193b30; box-shadow: none; border-radius: 16px; }
+.application-layout .brand-icon { background: #176b5b; box-shadow: none; border-radius: 12px; }
+.application-layout .navigation-link { color: #58655e; background: transparent; font-size: 13px; }
+.application-layout .navigation-link.active, .application-layout .navigation-link:hover { color: #176b5b; background: #edf4ef; }
+.application-layout .user-navigation .ant-btn { height: 42px; border-radius: 8px; }
+.application-layout .main-content { padding-top: 28px; }
+.application-layout .home-hero { min-height: 540px; border-radius: 18px; padding: 64px; box-shadow: none; background-position: center 58%; margin-bottom: 0; }
+.application-layout .home-hero-overlay { background: linear-gradient(90deg, rgba(11,31,27,.94), rgba(11,31,27,.69) 45%, rgba(11,31,27,.08)); }
+.application-layout .home-hero-content { max-width: 560px; }
+.application-layout .hero-badge { color: #d8ecdf; border-color: #688c79; background: #203e34a8; border-radius: 5px; font-size: 10px; letter-spacing: 2px; padding: 7px 12px; }
+.application-layout .hero-title.ant-typography { font-family: Inter, Arial, sans-serif; font-size: clamp(42px,5.5vw,76px); font-weight: 600; letter-spacing: -3.5px; max-width: 520px; line-height: 1.05; }
+.application-layout .hero-description.ant-typography { color: #dce5df; font-size: 15px; max-width: 430px; line-height: 1.85; }
+.application-layout .hero-actions .ant-btn-primary { background: #e0edbc; border-color: #e0edbc; color: #20382d; box-shadow: none; }
+.application-layout .hero-actions .ant-btn-default { background: transparent; color: #fff; border-color: #718a7e; }
+.application-layout .stats-section { margin: 0 0 54px; padding: 24px 0; border-bottom: 1px solid var(--border); }
+.application-layout .modern-stats-card { box-shadow: none; border: 0; background: transparent; border-radius: 0; }
+.application-layout .modern-stats-card .ant-card-body { padding: 12px 14px; }
+.application-layout .modern-stats-card h2 { font-size: 23px; letter-spacing: -.5px; margin-bottom: 4px; }
+.application-layout .stats-icon { background: #eaf0e6; color: #176b5b; border-radius: 12px; width: 46px; height: 46px; font-size: 21px; }
+.application-layout .section-label { color: #176b5b; font-size: 10px; font-weight: 700; letter-spacing: 2px; }
+.application-layout .section-heading h2, .application-layout .centered-section-heading h2 { color: #182c28; font-family: Inter, Arial, sans-serif; font-size: clamp(26px,3vw,36px); letter-spacing: -1px; font-weight: 600; }
+.application-layout .filter-section, #rental-guide, #rental-faq { scroll-margin-top: 110px; }
+.application-layout .filter-card { border: 1px solid var(--border); box-shadow: none; border-radius: 14px; }
+.application-layout .cars-section { margin-top: 38px; }
+.application-layout .premium-car-card { border: 1px solid var(--border); box-shadow: none; border-radius: 14px; animation: none; }
+.application-layout .premium-car-card:hover { transform: translateY(-4px); box-shadow: 0 14px 28px #182c2810; border-color: #9cb4a5; }
+.application-layout .car-image-wrapper { height: 232px; background: #edf0eb; }
+.application-layout .car-card-image { object-fit: cover; }
+.application-layout .car-name.ant-typography { font-size: 21px; letter-spacing: -.5px; font-weight: 600; }
+.application-layout .car-card-shine, .application-layout .car-floating-price, .application-layout .car-hover-overlay, .application-layout .car-status-circle { display: none; }
+.application-layout .car-booking-button { background: #176b5b; box-shadow: none; border: 0; border-radius: 8px; }
+.application-layout .car-category-text { font-size: 12px; }
+.application-layout .specification-icon { background: #eef4ee; color: #176b5b; }
+.application-layout .how-step-card, .application-layout .feature-card { background: #fff; box-shadow: none; border: 1px solid var(--border); border-radius: 14px; }
+.application-layout .how-step-icon, .application-layout .how-step-number { background: #eaf2e8; color: #176b5b; box-shadow: none; }
+.application-layout .faq-section { background: transparent; }
+.host-invitation { display: flex; align-items: center; justify-content: space-between; gap: 40px; background: #e8efdf; border-radius: 16px; padding: 48px; margin: 64px 0 20px; }
+.host-invitation h2 { margin: 12px 0; font-size: clamp(28px,3vw,40px); letter-spacing: -1.5px; color: #20372c; }
+.host-invitation p { max-width: 650px; margin: 0; line-height: 1.9; font-size: 14px; }
+.host-invitation .ant-btn { white-space: nowrap; height: 48px; background: #176b5b; color: white; border: 0; }
+.application-layout .modern-footer { background: #122c25; padding: 64px 0 24px; }
+.footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1.2fr; gap: 48px; }
+.footer-grid h3 { font-size: 13px; color: #fff; margin-bottom: 22px; }
+.footer-grid > div > a:not(.footer-brand) { display: block; color: #c2cec6; margin: 12px 0; font-size: 13px; }
+.footer-grid p { color: #a8beb0; font-size: 13px; line-height: 1.9; }
+.footer-grid .footer-brand { color: #d8e8bd; font-size: 26px; margin-bottom: 16px; }
+.footer-grid .footer-brand h2 { margin: 0; }
+.skip-link { position: fixed; left: 20px; top: -100px; background: white; color: #176b5b; padding: 12px 20px; z-index: 99999; }
+.skip-link:focus { top: 10px; }
+:focus-visible { outline: 3px solid #80aa92; outline-offset: 4px; }
+.chat-widget-container .chat-panel { width: min(390px, calc(100vw - 32px)); height: min(570px, calc(100dvh - 120px)); max-height: calc(100dvh - 120px); border: 1px solid var(--border); border-radius: 16px; }
+.chat-widget-container .chat-panel-header, .chat-widget-container .chat-trigger-button { background: #176b5b; }
+.chat-widget-container .chat-bubble-wrapper.user .chat-bubble { background: #176b5b; }
+.chat-bubble p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.chat-widget-container .chat-bubble { max-width: 92%; }
+.assistant-action { display: inline-block; color: #176b5b; font-weight: 600; margin-top: 12px; text-decoration: underline; }
+.assistant-reset { border: 0; background: white; font-size: 11px; color: #65746b; padding: 8px; cursor: pointer; }
+.chat-widget-container .chat-quick-replies { flex-wrap: wrap; flex-shrink: 0; }
+.chat-widget-container .chat-input-area { flex-shrink: 0; }
+.admin-application-layout .admin-sidebar { background: #122c25; box-shadow: none; }
+.admin-application-layout .admin-sidebar-logo { background: #176b5b; }
+.admin-application-layout .admin-top-header { box-shadow: none; border-bottom: 1px solid var(--border); }
+.admin-application-layout .admin-table-container { box-shadow: none; border: 1px solid var(--border); }
+.admin-application-layout .ant-table-thead > tr > th { background: #eef3ed; color: #34483c; font-size: 12px; }
+.admin-application-layout .ant-table-row:hover > td { background: #f7faf5; }
+@media (max-width: 900px) {
+ .site-container { width: calc(100% - 36px); }
+ .application-layout .home-hero { padding: 40px; min-height: 500px; }
+ .application-layout .desktop-navigation { display: none; }
+ .application-layout .mobile-menu-button { display: inline-flex; color: #176b5b; }
+ .footer-grid { grid-template-columns: 1fr 1fr; gap: 30px; }
+ .host-invitation { padding: 30px; }
+}
+@media (max-width: 600px) {
+ .application-layout .navbar-container.site-container { width: calc(100% - 28px); }
+ .site-container { width: calc(100% - 28px); }
+ .application-layout .navbar-container { min-height: 76px; gap: 12px; }
+ .application-layout .brand-icon { height: 36px; width: 36px; font-size: 20px; }
+ .application-layout .brand-text h2 { font-size: 20px; }
+ .application-layout .brand-text > span { display: none; }
+ .application-layout .user-navigation { gap: 8px; }
+ .application-layout .main-content { padding-top: 14px; }
+ .application-layout .home-hero { min-height: 490px; padding: 30px 24px; border-radius: 14px; background-position: 60% center; }
+ .application-layout .home-hero-overlay { background: #0b211bc2; }
+ .application-layout .hero-title.ant-typography { font-size: 48px; letter-spacing: -2px; }
+ .application-layout .hero-badge { letter-spacing: 1px; font-size: 9px; }
+ .application-layout .stats-section .ant-col { flex: 0 0 50%; max-width: 50%; }
+ .application-layout .modern-stats-card .ant-card-body { padding: 4px; gap: 8px; }
+ .application-layout .modern-stats-card h2 { font-size: 18px; }
+ .application-layout .modern-stats-card .ant-typography { font-size: 11px; }
+ .application-layout .stats-icon { width: 32px; height: 32px; font-size: 17px; }
+ .application-layout .section-heading { align-items: flex-start; }
+ .host-invitation { flex-direction: column; align-items: flex-start; gap: 22px; }
+ .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px 18px; }
+ .footer-grid > div:first-child { grid-column: 1 / -1; }
+ .application-layout .footer-bottom { padding-bottom: 70px; }
+ .chat-widget-container { right: 16px; bottom: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+ *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+.application-layout .mobile-menu-button { color: #176b5b !important; background: #edf4ef !important; border-color: #dfe5df !important; }
+.application-layout .mobile-menu-button .anticon { color: #176b5b !important; }
+.auth-page { background: #f1f4ee; }
+.auth-page .auth-container { box-shadow: 0 20px 70px #1c3c2812; }
+.auth-page .auth-visual-overlay { background: linear-gradient(0deg, #122c25ed, #122c2550); }
+.auth-page .auth-background-shape { background: #dfe9d5; }
