@@ -354,14 +354,14 @@ function BookingCar() {
                   <Col span={8}>
                     <div className="booking-benefit">
                       <ClockCircleOutlined />
-                      <span>24/7 Support</span>
+                      <span>Flexible Rentals</span>
                     </div>
                   </Col>
 
                   <Col span={8}>
                     <div className="booking-benefit">
                       <CheckCircleOutlined />
-                      <span>Verified Car</span>
+                      <span>Vehicle Details</span>
                     </div>
                   </Col>
                 </Row>
@@ -385,7 +385,7 @@ function BookingCar() {
                   </Title>
 
                   <Text type="secondary">
-                    Minimum booking duration is one hour
+                    Billed hourly; partial hours round up
                   </Text>
                 </div>
               </div>

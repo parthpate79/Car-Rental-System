@@ -118,3 +118,19 @@ body, .ant-typography, .ant-btn { font-family: Inter, Arial, sans-serif; }
 .auth-page .auth-container { box-shadow: 0 20px 70px #1c3c2812; }
 .auth-page .auth-visual-overlay { background: linear-gradient(0deg, #122c25ed, #122c2550); }
 .auth-page .auth-background-shape { background: #dfe9d5; }
+/* Keep the fleet summary compact when the sidebar reduces content width. */
+.admin-application-layout .admin-page-hero { padding: 30px; }
+.admin-application-layout .admin-page-hero-content { flex-direction: column; align-items: stretch; gap: 20px; }
+.admin-application-layout .admin-page-hero-main { align-items: center; flex-direction: row; }
+.admin-application-layout .admin-page-hero h1 { font-family: Inter, Arial, sans-serif; font-size: clamp(25px, 3vw, 34px); font-weight: 600; letter-spacing: -1px; }
+.admin-application-layout .admin-page-hero p { font-size: 13px; max-width: 680px; }
+.admin-application-layout .admin-page-hero-icon { width: 52px; height: 52px; font-size: 25px; border-radius: 12px; box-shadow: none; }
+.admin-application-layout .admin-page-hero-actions { justify-content: flex-start; }
+.admin-application-layout .admin-sidebar-link.active { background: #28735d; box-shadow: none; }
+.admin-application-layout .admin-page-hero-eyebrow, .admin-application-layout .admin-page-hero-stat span { color: #d3e6cd; }
+@media (max-width:600px) {
+ .application-layout .modern-stats-card h2.ant-typography { font-size: 18px; }
+ .admin-application-layout .admin-page-hero { padding: 22px 18px; }
+ .admin-application-layout .admin-page-hero-main { align-items: flex-start; }
+ .admin-application-layout .admin-page-hero-icon { display: none; }
+}
