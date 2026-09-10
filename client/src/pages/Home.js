@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import CustomerReviews from "../components/CustomerReviews";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Alert,
@@ -123,6 +123,7 @@ function SkeletonCarCard() {
 
 function Home() {
   const dispatch = useDispatch();
+  const homeRef = useRef(null);
 
   const carsState = useSelector((state) => state.carsReducer);
   const alertsState = useSelector((state) => state.alertsReducer);
@@ -327,27 +328,49 @@ function Home() {
     setSelectedRange(null);
   };
 
+  useEffect(() => {
+    if (!window.IntersectionObserver || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-in-view');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    homeRef.current?.querySelectorAll('[data-reveal]').forEach(element => observer.observe(element));
+    return () => observer.disconnect();
+  }, [filteredCars]);
+
   return (
     <DefaultLayout>
+      <div ref={homeRef} className="showroom-home">
 
 
       {/* Hero Section */}
       <section className="home-hero">
         <div className="home-hero-overlay" />
+        <div className="hero-ambient hero-ambient-one" aria-hidden="true" />
+        <div className="hero-ambient hero-ambient-two" aria-hidden="true" />
+        <div className="hero-visual" aria-hidden="true">
+          <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1500&q=85" alt="" fetchPriority="high" />
+          <div className="hero-visual-gradient" />
+          <span className="hero-photo-label">MADE FOR THE OPEN ROAD</span>
+        </div>
+        <div className="hero-float-label" aria-hidden="true"><span>↗</span><div>Your trip.<strong>Your pace.</strong></div></div>
 
         <div className="home-hero-content">
           <Tag className="hero-badge">
-            YOUR NEXT JOURNEY STARTS HERE
+            MORE THAN A RENTAL. A NEW POSSIBILITY.
           </Tag>
 
           <Title className="hero-title">
-            Good plans. Great drives.
+            <span>Find your</span><span className="hero-gradient-word">freedom.</span>
           </Title>
 
           <Paragraph className="hero-description">
-            A weekend escape, a family visit, or the everyday commute.
-            Find a car that fits your plans, with clear hourly pricing
-            and your trip details in one place.
+            Big adventures. Spontaneous detours. Everyday escapes.
+            Find the keys to your next chapter, with a car and an hourly rate that fit your plans.
           </Paragraph>
 
           <div className="hero-actions">
@@ -363,7 +386,7 @@ function Home() {
                   });
               }}
             >
-              Explore Cars
+              Find my ride ↗
             </Button>
 
             <Link to="/userbookings">
@@ -372,11 +395,14 @@ function Home() {
               </Button>
             </Link>
           </div>
+          <div className="hero-assurances"><span><SafetyCertificateOutlined /> Clear pricing</span><span><ClockCircleOutlined /> Flexible hours</span><span><CarOutlined /> Pay at pickup</span></div>
         </div>
       </section>
 
+      <div className="journey-ribbon" aria-hidden="true"><div className="journey-ribbon-track">{[0,1].map(copy => <span key={copy}>CITY LIGHTS <b>✦</b> WEEKEND ESCAPES <b>✦</b> OPEN ROADS <b>✦</b> YOUR NEXT CHAPTER <b>✦</b> </span>)}</div></div>
+
       {/* Statistics */}
-      <section className="stats-section">
+      <section className="stats-section" data-reveal>
         <Row gutter={[20, 20]}>
           <Col lg={6} md={12} xs={24}>
             <Card className="modern-stats-card" bordered={false}>
@@ -435,7 +461,7 @@ function Home() {
       </section>
 
       {/* Search and Filters */}
-      <section id="available-cars" className="filter-section">
+      <section id="available-cars" className="filter-section" data-reveal>
         <div className="section-heading">
           <div>
             <Text className="section-label">
@@ -443,7 +469,7 @@ function Home() {
             </Text>
 
             <Title level={2}>
-              Search available vehicles
+              Where will the road take you?
             </Title>
 
             <Paragraph>
@@ -608,7 +634,7 @@ function Home() {
             </Text>
 
             <Title level={2}>
-              Choose your perfect ride
+              Meet your next adventure.
             </Title>
 
             <Paragraph>
@@ -617,6 +643,11 @@ function Home() {
           </div>
         </div>
 
+        <div className="fleet-quick-filters" aria-label="Quick fuel filters">
+          <button className={fuelType === 'all' ? 'selected' : ''} aria-pressed={fuelType === 'all'} onClick={() => setFuelType('all')}>All rides <span>{cars.length}</span></button>
+          {fuelOptions.map(fuel => <button key={fuel.value} aria-pressed={fuelType === fuel.value} className={fuelType === fuel.value ? 'selected' : ''} onClick={() => setFuelType(fuel.value)}>{fuel.label}</button>)}
+          <span className="fleet-caption">A car for every kind of day.</span>
+        </div>
         {carsState.error && <Alert type="warning" showIcon message="We couldn’t load the fleet" description="The rental service may be waking up. Please try again in a moment." action={<Button onClick={() => dispatch(getAllCars())}>Try again</Button>} style={{ marginBottom: 24 }} />}
         {/* Skeleton loading while fetching */}
         {loading && cars.length === 0 ? (
@@ -661,30 +692,31 @@ function Home() {
 
               return (
                 <Col
-                  xl={6}
+                  xl={8}
                   lg={8}
                   md={12}
-                  sm={12}
+                  sm={24}
                   xs={24}
                   key={car._id}
-                  className="car-grid-column"
+                  className="car-grid-column" data-reveal
                 >
                   <Card
                     className="premium-car-card"
                     bordered={false}
                     style={{
-                      animationDelay: `${index * 80}ms`,
+                      "--card-delay": `${Math.min(index % 3, 2) * 70}ms`,
                     }}
                     cover={
                       <div className="car-image-wrapper">
                         <img
                           src={
                             car.image ||
-                            "https://placehold.co/600x400?text=DriveEase"
+                            "/car-placeholder.svg"
                           }
                           alt={`${car.name} rental car`}
                           className="car-card-image"
                           loading="lazy"
+                          onError={event => { if (!event.currentTarget.src.endsWith('/car-placeholder.svg')) event.currentTarget.src = '/car-placeholder.svg'; }}
                         />
 
                         <div className="car-image-overlay" />
@@ -845,7 +877,7 @@ function Home() {
 
         <div className="how-it-works-steps">
           {HOW_IT_WORKS_STEPS.map((step, i) => (
-            <div className="how-step-card" key={step.step}>
+            <div className="how-step-card" data-reveal key={step.step}>
               <div className="how-step-number">{step.step}</div>
               <div className="how-step-icon">{step.icon}</div>
               <Title level={4}>{step.title}</Title>
@@ -969,6 +1001,7 @@ function Home() {
       </section>
 
       <CustomerReviews />
+      </div>
     </DefaultLayout>
   );
 }

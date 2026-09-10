@@ -412,9 +412,9 @@ a {
   box-shadow:
     0 12px 35px rgba(15, 23, 42, 0.08),
     0 2px 8px rgba(15, 23, 42, 0.04);
-  opacity: 0;
-  transform: translateY(24px) scale(0.98);
-  animation: carCardEntrance 0.65s ease forwards;
+  opacity: 1;
+  transform: none;
+  animation: none;
   transition:
     transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
     box-shadow 0.4s ease,

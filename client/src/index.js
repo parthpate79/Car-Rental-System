@@ -15,7 +15,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <ConfigProvider theme={{ token: { colorPrimary: "#176b5b", borderRadius: 8, fontFamily: "Inter, Arial, sans-serif" } }}><App /></ConfigProvider>
+      <ConfigProvider theme={{ token: { colorPrimary: "#6d5dfc", borderRadius: 8, fontFamily: "Inter, Arial, sans-serif" } }}><App /></ConfigProvider>
     </Provider>
   </React.StrictMode>
 );
