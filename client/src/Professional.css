@@ -308,6 +308,6 @@ body, .ant-typography, .ant-btn { font-family: Inter, Arial, sans-serif; }
 .stories-empty h3 { font-size: 24px; letter-spacing: -.6px; }
 .stories-empty p { max-width: 620px; color: #666c80; line-height: 1.8; }
 .stories-empty a { color: #6148bd; font-weight: 600; }
-@keyframes stories-flow { to { transform: translateX(-50%); } }
+@keyframes stories-flow { to { transform: translateX(calc(-50% - 11px)); } }
 @media(max-width:768px) { .showroom-home .how-it-works-steps { grid-template-columns: 1fr; gap: 18px; } .showroom-home .how-step-card { padding: 28px; } .stories-heading { align-items: flex-start; flex-direction: column; } .renter-stories { margin-top: 50px; } .story-card { width: 285px; padding: 22px; } .stories-empty { padding: 25px; gap: 15px; } .empty-quote { font-size: 75px; } .application-layout .driveease-mark { width: 40px; height: 40px; } }
 @media(prefers-reduced-motion:reduce) { .has-motion .stories-track { animation: none; } .stories-window.has-motion { overflow: auto; } .stories-group[aria-hidden="true"] { display: none; } }

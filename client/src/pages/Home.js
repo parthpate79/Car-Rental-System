@@ -738,12 +738,12 @@ function Home() {
                           </div>
                         </div>
 
-                        <Tag
+                        {selectedRange && <Tag
                           className="availability-tag"
                           color={available ? "green" : "red"}
                         >
-                          {!selectedRange ? "Select dates" : available ? "Available for your dates" : "Booked"}
-                        </Tag>
+                          {available ? "Available for your dates" : "Booked"}
+                        </Tag>}
 
                         {/* Category badge */}
                         {category && (
