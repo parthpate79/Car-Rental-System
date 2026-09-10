@@ -272,3 +272,42 @@ body, .ant-typography, .ant-btn { font-family: Inter, Arial, sans-serif; }
  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
  .application-layout .premium-car-card { opacity: 1; visibility: visible; transform: none; }
 }
+
+/* Editorial journey guide and authentic renter stories */
+.application-layout .driveease-mark { width: 48px; height: 48px; flex-shrink: 0; filter: drop-shadow(0 5px 9px #17182d18); }
+.application-layout .footer-brand .driveease-mark { width: 40px; height: 40px; }
+.showroom-home .how-it-works-section { padding: 55px 0; }
+.showroom-home .how-it-works-steps { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; align-items: stretch; }
+.showroom-home .how-step-card { padding: 36px 30px 32px; text-align: left; background: linear-gradient(145deg,#fff,#faf9ff); min-width: 0; }
+.showroom-home .how-step-number { position: absolute; top: 29px; right: 26px; left: auto; transform: none; width: auto; height: auto; font-size: 46px; line-height: 1; letter-spacing: -3px; color: #d5cef5; }
+.showroom-home .how-step-icon { margin: 0 0 32px; width: 54px; height: 54px; font-size: 25px; background: #17182d; color: #c8bfff; }
+.showroom-home .how-step-card h4.ant-typography { font-size: 22px; letter-spacing: -.5px; }
+.showroom-home .how-step-card p.ant-typography { font-size: 14px; line-height: 1.8; color: #687084; }
+.showroom-home .how-step-connector { display: none; }
+.renter-stories { margin: 85px 0 60px; }
+.stories-heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 30px; }
+.stories-heading h2 { font-size: clamp(30px,4vw,46px); letter-spacing: -1.7px; margin: 10px 0; color: #17182d; }
+.stories-heading p { color: #687084; }
+.motion-toggle { background: white; border: 1px solid #e2def1; border-radius: 99px; padding: 11px 19px; color: #5141ad; cursor: pointer; white-space: nowrap; }
+.stories-window { overflow: auto; padding: 10px 0 20px; }
+.stories-window.has-motion { overflow: hidden; }
+.stories-track, .stories-group { display: flex; gap: 22px; width: max-content; }
+.has-motion .stories-track { animation: stories-flow 65s linear infinite; }
+.stories-window:hover .stories-track, .stories-window:focus-within .stories-track, .stories-window.is-paused .stories-track { animation-play-state: paused; }
+.story-card { width: 340px; padding: 28px; background: white; border: 1px solid #e6e3f0; border-radius: 22px; display: flex; flex-direction: column; }
+.story-stars { color: #8063d8; letter-spacing: 3px; margin-bottom: 18px; font-size: 18px; }
+.story-stars span { color: #a6a0b5; }
+.story-card h3 { font-size: 18px; }
+.story-card blockquote { font-size: 15px; line-height: 1.8; color: #555b70; margin: 0 0 26px; overflow-wrap: anywhere; }
+.story-person { margin-top: auto; display: flex; align-items: center; gap: 12px; border-top: 1px solid #eeecf5; padding-top: 20px; }
+.story-avatar { width: 40px; height: 40px; border-radius: 50%; background: #eeebfb; color: #6e55c2; display: grid; place-items: center; font-weight: 700; }
+.story-person strong, .story-person small { display: block; } .story-person small { color: #7a7c8f; margin-top: 3px; }
+.story-quote { font: 50px Georgia,serif; margin-left: auto; color: #c5bce8; }
+.stories-empty { border: 1px solid #e2deef; border-radius: 24px; background: linear-gradient(115deg,#eeebfa,#fff); padding: 38px; display: flex; gap: 30px; align-items: center; }
+.empty-quote { font: 130px/1 Georgia,serif; color: #9684d5; }
+.stories-empty h3 { font-size: 24px; letter-spacing: -.6px; }
+.stories-empty p { max-width: 620px; color: #666c80; line-height: 1.8; }
+.stories-empty a { color: #6148bd; font-weight: 600; }
+@keyframes stories-flow { to { transform: translateX(-50%); } }
+@media(max-width:768px) { .showroom-home .how-it-works-steps { grid-template-columns: 1fr; gap: 18px; } .showroom-home .how-step-card { padding: 28px; } .stories-heading { align-items: flex-start; flex-direction: column; } .renter-stories { margin-top: 50px; } .story-card { width: 285px; padding: 22px; } .stories-empty { padding: 25px; gap: 15px; } .empty-quote { font-size: 75px; } .application-layout .driveease-mark { width: 40px; height: 40px; } }
+@media(prefers-reduced-motion:reduce) { .has-motion .stories-track { animation: none; } .stories-window.has-motion { overflow: auto; } .stories-group[aria-hidden="true"] { display: none; } }

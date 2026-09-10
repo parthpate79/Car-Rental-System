@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Dropdown } from 'antd';
-import { CarOutlined, MenuOutlined, UserOutlined } from '@ant-design/icons';
+import { MenuOutlined, UserOutlined } from '@ant-design/icons';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import ChatWidget from './ChatWidget';
 import ScrollToTop from './ScrollToTop';
@@ -20,7 +20,7 @@ export default function DefaultLayout({ children }) {
     <a className="skip-link" href="#main-content">Skip to content</a>
     <header className="modern-header">
       <div className="site-container navbar-container">
-        <Link to="/" className="brand-link" aria-label="DriveEase home"><div className="brand-icon"><CarOutlined /></div><div className="brand-text"><h2>DriveEase<span className="brand-dot">.</span></h2><span>More than a destination</span></div></Link>
+        <Link to="/" className="brand-link" aria-label="DriveEase home"><img className="driveease-mark" src="/driveease-mark.svg" alt="" /><div className="brand-text"><h2>DriveEase<span className="brand-dot">.</span></h2><span>More than a destination</span></div></Link>
         <nav className="desktop-navigation" aria-label="Main navigation">
           {links.map(item => <Link key={item.path} to={item.path} className={`navigation-link ${location.pathname === item.path ? 'active' : ''}`}>{item.label}</Link>)}
           <a href="/#rental-guide" className="navigation-link">How it works</a>
@@ -34,7 +34,7 @@ export default function DefaultLayout({ children }) {
     <main id="main-content" className="main-content"><div className="site-container">{children}</div></main>
     <footer className="modern-footer"><div className="site-container">
       <div className="footer-grid">
-        <div><Link className="footer-brand" to="/"><CarOutlined /><h2>DriveEase.</h2></Link><p className="footer-description">A little freedom. A new route. Find your next rental and make the journey your own.</p></div>
+        <div><Link className="footer-brand" to="/"><img className="driveease-mark" src="/driveease-mark.svg" alt="" /><h2>DriveEase.</h2></Link><p className="footer-description">A little freedom. A new route. Find your next rental and make the journey your own.</p></div>
         <div><h3>On the road</h3><Link to="/">Explore the fleet</Link><Link to="/userbookings">Manage bookings</Link><a href="/#rental-guide">Your rental guide</a></div>
         <div><h3>For car owners</h3><Link to="/list-your-car">List your car</Link><Link to="/my-car-listings">Track your listings</Link><Link to="/owner-earnings">View earnings</Link></div>
         <div><h3>Before you book</h3><p>Check your dates, review the hourly rate and service fee, then confirm your reservation.</p><a href="/#rental-faq">Questions? Start here ↗</a></div>
